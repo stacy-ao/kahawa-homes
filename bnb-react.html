@@ -90,6 +90,17 @@
     .nav-search-pill:last-of-type { border-right: none; }
     .nav-search-pill:hover { background: var(--cream); }
     .nav-search-pill svg { color: var(--espresso-lt); flex-shrink: 0; }
+    .nav-search-input {
+      flex: 1;
+      min-width: 0;
+      padding: .75rem 1rem;
+      border: none;
+      outline: none;
+      background: transparent;
+      color: var(--espresso);
+      font: inherit;
+    }
+    .nav-search-input::placeholder { color: var(--espresso); opacity: 1; }
     .nav-search-btn {
       margin: .35rem .35rem .35rem 0;
       width: 36px; height: 36px; border-radius: 50%;
@@ -609,31 +620,26 @@ const getAmenityIcon = (name) => {
 /* ────────────────────────────────────────────
    NAV
 ──────────────────────────────────────────── */
-function Nav({ onLogoClick }) {
+function Nav({ onLogoClick, search, onSearch }) {
   return h('nav', { className: 'nav' },
     h('div', { className: 'nav-logo', onClick: onLogoClick },
       'Kahawa', h('span', null, ' Homes')
     ),
-    h('div', { className: 'nav-search' },
-      h('div', { className: 'nav-search-pill' }, 'Anywhere'),
-      h('div', { className: 'nav-search-pill' }, 'Anytime'),
-      h('div', { className: 'nav-search-pill' }, 'Add guests'),
-      h('button', { className: 'nav-search-btn', 'aria-label': 'Search' }, h(IconSearch))
+    h('form', { className: 'nav-search', onSubmit: e => e.preventDefault() },
+      h('input', {
+        className: 'nav-search-input',
+        type: 'search',
+        value: search,
+        onChange: e => onSearch(e.target.value),
+        placeholder: 'Search homes or locations',
+        'aria-label': 'Search homes or locations'
+      }),
+      h('button', { className: 'nav-search-btn', type: 'submit', 'aria-label': 'Search' }, h(IconSearch))
     ),
     h('div', { className: 'nav-right' },
       h('button', { className: 'nav-link' }, 'Become a host'),
       h('button', { className: 'nav-avatar', 'aria-label': 'Menu' }, h(IconUser))
     )
-  );
-}
-
-/* ────────────────────────────────────────────
-   FILTER BAR
-──────────────────────────────────────────── */
-const filters = ['All locations', 'Bamburi', 'Nyali', 'Old Town', 'Diani Beach', 'Tudor', 'Kilifi Town'];
-function FilterBar({ active, onChange }) {
-  return h('div', { className: 'filter-bar' },
-    filters.map(f => h('button', { key: f, className: `chip${active === f ? ' active' : ''}`, onClick: () => onChange(f) }, f))
   );
 }
 
@@ -669,13 +675,13 @@ function PropertyCard({ prop, onClick }) {
 /* ────────────────────────────────────────────
    HOME VIEW
 ──────────────────────────────────────────── */
-function HomeView({ onSelect, filter }) {
-  const filtered = filter === 'All locations'
-    ? properties
-    : properties.filter(prop => prop.location.startsWith(`${filter},`) || prop.location === filter);
+function HomeView({ onSelect, search }) {
+  const searchTerm = search.trim().toLowerCase();
+  const filtered = properties.filter(prop => !searchTerm || [prop.name, prop.location, prop.description]
+    .some(value => value.toLowerCase().includes(searchTerm)));
   return h('div', { className: 'home-wrap fade-in' },
     h('div', { className: 'section-heading' },
-      `${filter === 'All locations' ? 'Popular homes' : `Homes in ${filter}`} →`
+      `${searchTerm ? `Search results for "${search.trim()}"` : 'Popular homes'} →`
     ),
     h('div', { className: 'prop-grid' },
       filtered.map(p => h(PropertyCard, { key: p.id, prop: p, onClick: () => onSelect(p) }))
@@ -891,17 +897,16 @@ function Footer() {
 ──────────────────────────────────────────── */
 function App() {
   const [selected, setSelected] = useState(null);
-  const [filter, setFilter]     = useState('All');
+  const [search, setSearch]     = useState('');
 
   const goHome = () => { setSelected(null); window.scrollTo(0,0); };
   const goDetail = (p) => { setSelected(p); window.scrollTo(0,0); };
 
   return h(React.Fragment, null,
-    h(Nav, { onLogoClick: goHome }),
-    !selected && h(FilterBar, { active: filter, onChange: setFilter }),
+    h(Nav, { onLogoClick: goHome, search, onSearch: setSearch }),
     selected
       ? h(DetailView, { prop: selected, onBack: goHome })
-      : h(HomeView, { onSelect: goDetail, filter }),
+      : h(HomeView, { onSelect: goDetail, search }),
     h(Footer, null)
   );
 }
