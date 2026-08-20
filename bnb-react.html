@@ -36,7 +36,8 @@
     }
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     html { scroll-behavior: smooth; }
-    body { font-family: var(--sans); background: var(--cream); color: var(--espresso); line-height: 1.65; -webkit-font-smoothing: antialiased; }
+    body { font-family: var(--sans); background: #e8e0d2; color: var(--espresso); line-height: 1.65; -webkit-font-smoothing: antialiased; }
+    .site-shell { width: min(100%, 1180px); min-height: 100vh; margin: 0 auto; background: var(--cream); box-shadow: 0 0 40px rgba(30,18,10,.12); }
     button { font-family: inherit; cursor: pointer; }
     img { display: block; max-width: 100%; }
     input, select { font-family: inherit; }
@@ -154,7 +155,7 @@
     /* ══════════════════════════════════════════
        HOMEPAGE — PROPERTY GRID
     ══════════════════════════════════════════ */
-    .home-wrap { max-width: 1280px; margin: 0 auto; padding: 2rem; }
+    .home-wrap { max-width: 980px; margin: 0 auto; padding: 1.6rem 2rem 5rem; }
     .section-heading {
       font-family: var(--serif);
       font-size: 1.4rem; font-weight: 700;
@@ -163,7 +164,7 @@
     }
     .prop-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
       gap: 1.6rem;
     }
 
@@ -320,7 +321,8 @@
     .landing-brand span { color: var(--gold); }
     .landing-content { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; gap: 1.5rem; }
     .landing-collage { position: relative; width: min(76vw, 470px); height: min(58vw, 360px); margin: 1rem 0; }
-    .landing-photo { position: absolute; overflow: hidden; border: .45rem solid var(--cream); box-shadow: var(--shadow-md); }
+    .landing-photo { position: absolute; overflow: hidden; border: .45rem solid var(--cream); box-shadow: var(--shadow-md); cursor: pointer; transition: filter .25s, box-shadow .25s, z-index .25s; }
+    .landing-photo:hover, .landing-photo.active { filter: saturate(1.15) brightness(1.04); box-shadow: 0 10px 30px rgba(30,18,10,.24); z-index: 4; }
     .landing-photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
     .landing-photo.one { width: 48%; height: 68%; left: 0; top: 14%; border-radius: 48% 48% 10% 48%; transform: rotate(-8deg); }
     .landing-photo.two { width: 42%; height: 76%; left: 29%; top: 2%; border-radius: 48% 48% 48% 10%; transform: rotate(3deg); }
@@ -341,7 +343,7 @@
     .recent-card { position: relative; flex: 0 0 145px; height: 112px; overflow: hidden; border-radius: 1rem; }
     .recent-card img { width: 100%; height: 100%; object-fit: cover; }
     .recent-card span { position: absolute; left: .5rem; bottom: .5rem; background: white; border-radius: 9999px; padding: .25rem .55rem; font-size: .68rem; font-weight: 700; }
-    .browse-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; }
+    .browse-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1rem; }
     .browse-grid .card-img { aspect-ratio: 1 / 1.08; }
     .bottom-nav { position: fixed; z-index: 10; bottom: 1rem; left: 50%; transform: translateX(-50%); background: var(--espresso); color: white; border-radius: 9999px; display: flex; gap: .2rem; padding: .45rem; box-shadow: var(--shadow-md); }
     .bottom-nav button { width: 42px; height: 38px; border: none; border-radius: 9999px; color: rgba(255,255,255,.7); background: transparent; display: grid; place-items: center; cursor: pointer; }
@@ -441,6 +443,17 @@
     .date-field:first-child { border-right: 1px solid var(--border); }
     .date-field:focus { background: var(--cream); }
     .date-label { font-size: .68rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; display: block; margin-bottom: .2rem; }
+    .calendar-field { position: relative; padding: .7rem .9rem; min-width: 0; }
+    .calendar-value { width: 100%; border: none; background: transparent; color: var(--espresso); text-align: left; font: inherit; cursor: pointer; }
+    .calendar-value.empty { color: var(--muted); }
+    .calendar-popover { position: absolute; z-index: 15; top: calc(100% + .4rem); left: 0; width: 260px; padding: .8rem; background: var(--white); border: 1px solid var(--border); border-radius: .8rem; box-shadow: var(--shadow-lg); }
+    .calendar-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: .6rem; font-size: .8rem; font-weight: 700; }
+    .calendar-head button { width: 25px; height: 25px; border: 1px solid var(--border); border-radius: 50%; background: var(--white); }
+    .calendar-week, .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: .2rem; text-align: center; }
+    .calendar-week { color: var(--muted); font-size: .65rem; margin-bottom: .2rem; }
+    .calendar-day { min-height: 28px; border: none; border-radius: .35rem; background: transparent; font-size: .72rem; }
+    .calendar-day:hover:not(:disabled), .calendar-day.selected { background: var(--gold-lt); }
+    .calendar-day:disabled { color: #b8b0a4; background: #eeeae3; cursor: not-allowed; text-decoration: line-through; }
     .guests-field {
       width: 100%; padding: .75rem .9rem;
       border: 1.5px solid var(--border); border-radius: var(--r);
@@ -524,7 +537,7 @@
       .photo-modal-close { top: 4.75rem; right: 1rem; }
       .landing-screen { padding: 1.2rem; }
       .recent-row { margin-left: -1.2rem; margin-right: -1.2rem; padding-left: 1.2rem; padding-right: 1.2rem; }
-      .browse-grid { gap: .8rem; }
+      .browse-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .8rem; }
       .bottom-nav { bottom: .65rem; }
       .detail-bottom-bar { bottom: .65rem; }
     }
@@ -765,12 +778,13 @@ function FilterBar({ active, onChange, properties }) {
 }
 
 function LandingView({ onExplore, properties, userName, onNameChange }) {
+  const [activePhoto, setActivePhoto] = useState(1);
   const photos = (properties.length ? properties : fallbackProperties).flatMap(property => property.images).slice(0, 3);
   return h('main', { className: 'landing-screen' },
     h('div', { className: 'landing-brand' }, 'Kahawa', h('span', null, ' Homes')),
     h('div', { className: 'landing-content' },
       h('div', { className: 'landing-collage' },
-        photos.map((photo, index) => h('div', { key: photo + index, className: `landing-photo ${['one','two','three'][index]}` }, h('img', { src: photo, alt: '' })))
+        photos.map((photo, index) => h('button', { key: photo + index, className: `landing-photo ${['one','two','three'][index]}${activePhoto === index ? ' active' : ''}`, onClick: () => setActivePhoto(index), 'aria-label': `Focus photo ${index + 1}` }, h('img', { src: photo, alt: '' })))
       ),
       h('p', { className: 'landing-subtitle' }, 'No stress, just relax'),
       h('h1', { className: 'landing-title' }, 'Find the perfect place to relax for a couple of taps'),
@@ -892,6 +906,42 @@ function BookingReminder({ booking, onClose }) {
   );
 }
 
+const dateKey = date => `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+function CalendarPicker({ label, value, onChange, bookedDates, minDate }) {
+  const [open, setOpen] = useState(false);
+  const [month, setMonth] = useState(() => {
+    const initial = value ? new Date(`${value}T12:00:00`) : new Date();
+    return new Date(initial.getFullYear(), initial.getMonth(), 1);
+  });
+  const monthName = month.toLocaleString('en', { month: 'long', year: 'numeric' });
+  const firstDay = new Date(month.getFullYear(), month.getMonth(), 1).getDay();
+  const daysInMonth = new Date(month.getFullYear(), month.getMonth() + 1, 0).getDate();
+  const cells = [...Array(firstDay).fill(null), ...Array.from({ length: daysInMonth }, (_, index) => index + 1)];
+  const chooseDate = day => {
+    const selected = new Date(month.getFullYear(), month.getMonth(), day);
+    const key = dateKey(selected);
+    if (!bookedDates.includes(key) && (!minDate || key >= minDate)) { onChange(key); setOpen(false); }
+  };
+  return h('div', { className: 'calendar-field' },
+    h('label', { className: 'date-label' }, label),
+    h('button', { className: `calendar-value${value ? '' : ' empty'}`, onClick: () => setOpen(!open), type: 'button' }, value || 'Select date'),
+    open && h('div', { className: 'calendar-popover' },
+      h('div', { className: 'calendar-head' },
+        h('button', { type: 'button', onClick: () => setMonth(new Date(month.getFullYear(), month.getMonth() - 1, 1)), 'aria-label': 'Previous month' }, '‹'),
+        h('span', null, monthName),
+        h('button', { type: 'button', onClick: () => setMonth(new Date(month.getFullYear(), month.getMonth() + 1, 1)), 'aria-label': 'Next month' }, '›')
+      ),
+      h('div', { className: 'calendar-week' }, ['Su','Mo','Tu','We','Th','Fr','Sa'].map(day => h('span', { key: day }, day))),
+      h('div', { className: 'calendar-grid' }, cells.map((day, index) => {
+        if (!day) return h('span', { key: `empty-${index}` });
+        const key = dateKey(new Date(month.getFullYear(), month.getMonth(), day));
+        const disabled = bookedDates.includes(key) || (minDate && key < minDate);
+        return h('button', { key, type: 'button', className: `calendar-day${value === key ? ' selected' : ''}`, disabled, onClick: () => chooseDate(day), title: bookedDates.includes(key) ? 'Already booked' : undefined }, day);
+      }))
+    )
+  );
+}
+
 function DetailBottomBar({ prop, onBook }) {
   return h('div', { className: 'detail-bottom-bar' },
     h('div', null, h('strong', null, `KES ${prop.pricePerNight.toLocaleString()} total`), h('small', null, ' before dates and fees')),
@@ -925,9 +975,11 @@ function DetailView({ prop, onBack, userName, onBooking, onBook }) {
     ? Math.max(0, Math.round((new Date(checkOut) - new Date(checkIn)) / 86400000))
     : 0;
   const total = nights * prop.pricePerNight;
+  const hasBookedDateInRange = checkIn && checkOut && prop.bookedDates.some(bookedDate => bookedDate >= checkIn && bookedDate < checkOut);
 
   const handleBook = () => {
     if (!name || !checkIn || !checkOut) { alert('Please fill in your name and dates.'); return; }
+    if (hasBookedDateInRange || prop.bookedDates.includes(checkIn) || prop.bookedDates.includes(checkOut)) { alert('One or more selected dates are already booked. Please choose different dates.'); return; }
     onBooking({ property: prop.name, location: prop.location, checkIn, checkOut, name, createdAt: Date.now() });
     const msg = `Hello! I would like to book *${prop.name}* in *${prop.location}* from *${checkIn}* to *${checkOut}* for *${guests} guest(s)*. My name is *${name}*. Please confirm availability. Thank you!`;
     window.open(`https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(msg)}`, '_blank');
@@ -1065,14 +1117,8 @@ function DetailView({ prop, onBack, userName, onBooking, onBook }) {
           // Dates
           h('div', { style: { fontSize: '.72rem', fontWeight: 700, letterSpacing: '.08em', textTransform: 'uppercase', marginBottom: '.4rem' } }, 'Dates'),
           h('div', { className: 'date-row' },
-            h('div', { style: { borderRight: '1px solid var(--border)', padding: 0 } },
-              h('label', { className: 'date-label', style: { padding: '.7rem .9rem .1rem' } }, 'Check-in'),
-              h('input', { className: 'date-field', type: 'date', value: checkIn, onChange: e => setCheckIn(e.target.value), style: { display: 'block' } })
-            ),
-            h('div', null,
-              h('label', { className: 'date-label', style: { padding: '.7rem .9rem .1rem' } }, 'Check-out'),
-              h('input', { className: 'date-field', type: 'date', value: checkOut, onChange: e => setCheckOut(e.target.value), style: { display: 'block' } })
-            )
+            h(CalendarPicker, { label: 'Check-in', value: checkIn, onChange: value => { setCheckIn(value); if (checkOut && value >= checkOut) setCheckOut(''); }, bookedDates: prop.bookedDates }),
+            h(CalendarPicker, { label: 'Check-out', value: checkOut, onChange: setCheckOut, bookedDates: prop.bookedDates, minDate: checkIn || undefined })
           ),
 
           // Guests
@@ -1161,6 +1207,7 @@ function normalizeProperty(property, index) {
     badge: property.badge ?? 'Featured home',
     host: property.host ?? { name: 'Kahawa Homes', months: 0 },
     images: Array.isArray(property.images) ? property.images : [],
+    bookedDates: Array.isArray(property.bookedDates) ? property.bookedDates : [],
     amenities: Array.isArray(property.amenities) ? property.amenities : [],
     rules: Array.isArray(property.rules) ? property.rules : [],
     description: property.description ?? '',
@@ -1249,8 +1296,8 @@ function App() {
 
   return h(React.Fragment, null,
     currentScreen === 'landing'
-      ? h(LandingView, { onExplore: () => setCurrentScreen('browse'), properties, userName, onNameChange: saveUserName })
-      : h(React.Fragment, null,
+      ? h('div', { className: 'site-shell' }, h(LandingView, { onExplore: () => setCurrentScreen('browse'), properties, userName, onNameChange: saveUserName }))
+      : h('div', { className: 'site-shell' },
         h(Nav, { onLogoClick: goHome, search, onSearch: setSearch }),
         propertiesError && h('p', { className: 'load-error', role: 'alert' }, propertiesError),
         propertiesLoading && h('p', { className: 'load-error' }, 'Loading current properties...'),
