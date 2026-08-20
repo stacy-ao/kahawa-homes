@@ -440,7 +440,7 @@
 <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
 <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
 <script>
-const { useState } = React;
+const { useEffect, useState } = React;
 const h = React.createElement;
 
 /* ────────────────────────────────────────────
@@ -448,7 +448,7 @@ const h = React.createElement;
 ──────────────────────────────────────────── */
 const WA_NUMBER = '254795526788'; // ← Replace with real number (no + or spaces)
 
-const properties = [
+const fallbackProperties = [
   {
     id: 1,
     name: 'Radium Stay Inn',
@@ -675,7 +675,7 @@ function PropertyCard({ prop, onClick }) {
 /* ────────────────────────────────────────────
    HOME VIEW
 ──────────────────────────────────────────── */
-function HomeView({ onSelect, search }) {
+function HomeView({ onSelect, search, properties }) {
   const searchTerm = search.trim().toLowerCase();
   const filtered = properties.filter(prop => !searchTerm || [prop.name, prop.location, prop.description]
     .some(value => value.toLowerCase().includes(searchTerm)));
@@ -898,15 +898,35 @@ function Footer() {
 function App() {
   const [selected, setSelected] = useState(null);
   const [search, setSearch]     = useState('');
+  const [properties, setProperties] = useState(fallbackProperties);
+  const [propertiesError, setPropertiesError] = useState('');
+
+  useEffect(() => {
+    fetch('properties.json')
+      .then(response => {
+        if (!response.ok) throw new Error(`Could not load properties.json (${response.status})`);
+        return response.json();
+      })
+      .then(data => {
+        const loadedProperties = Array.isArray(data) ? data : data.properties;
+        if (!Array.isArray(loadedProperties)) throw new Error('properties.json must contain an array of properties');
+        setProperties(loadedProperties);
+      })
+      .catch(error => {
+        console.error(error);
+        setPropertiesError('Property data could not be loaded. Showing the default listings.');
+      });
+  }, []);
 
   const goHome = () => { setSelected(null); window.scrollTo(0,0); };
   const goDetail = (p) => { setSelected(p); window.scrollTo(0,0); };
 
   return h(React.Fragment, null,
     h(Nav, { onLogoClick: goHome, search, onSearch: setSearch }),
+    propertiesError && h('p', { className: 'load-error', role: 'alert' }, propertiesError),
     selected
       ? h(DetailView, { prop: selected, onBack: goHome })
-      : h(HomeView, { onSelect: goDetail, search }),
+      : h(HomeView, { onSelect: goDetail, search, properties }),
     h(Footer, null)
   );
 }

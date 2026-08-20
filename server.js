@@ -20,7 +20,8 @@ const server = http.createServer((req, res) => {
     '.jpg': 'image/jpeg',
     '.jpeg': 'image/jpeg',
     '.gif': 'image/gif',
-    '.svg': 'image/svg+xml'
+    '.svg': 'image/svg+xml',
+    '.json': 'application/json'
   };
   const contentType = mimeTypes[ext] || 'application/octet-stream';
 
