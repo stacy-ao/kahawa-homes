@@ -796,17 +796,28 @@ function FilterBar({ active, onChange, properties }) {
 
 function LandingView({ onExplore, properties, userName, onNameChange }) {
   const [activePhoto, setActivePhoto] = useState(1);
+  const [lightboxPhoto, setLightboxPhoto] = useState(null);
   const photos = (properties.length ? properties : fallbackProperties).flatMap(property => property.images).slice(0, 3);
   return h('main', { className: 'landing-screen' },
     h('div', { className: 'landing-brand' }, 'Kahawa', h('span', null, ' Homes')),
     h('div', { className: 'landing-content' },
       h('div', { className: 'landing-collage' },
-        photos.map((photo, index) => h('button', { key: photo + index, className: `landing-photo ${['one','two','three'][index]}${activePhoto === index ? ' active' : ''}`, onClick: () => setActivePhoto(index), 'aria-label': `Focus photo ${index + 1}` }, h('img', { src: photo, alt: '' })))
+        photos.map((photo, index) => h('button', { key: photo + index, className: `landing-photo ${['one','two','three'][index]}${activePhoto === index ? ' active' : ''}`, onClick: () => { setActivePhoto(index); setLightboxPhoto(index); }, 'aria-label': `Open photo ${index + 1}` }, h('img', { src: photo, alt: '' })))
       ),
       h('p', { className: 'landing-subtitle' }, 'No stress, just relax'),
       h('h1', { className: 'landing-title' }, 'Find the perfect place to relax for a couple of taps'),
       h('input', { className: 'landing-name', value: userName, onChange: event => onNameChange(event.target.value), placeholder: 'What should we call you?', 'aria-label': 'Your name' }),
       h('button', { className: 'landing-cta', onClick: onExplore }, 'Let\'s Escape')
+    ),
+    lightboxPhoto !== null && h('div', { className: 'photo-modal', role: 'dialog', 'aria-modal': 'true', 'aria-label': 'Homepage photo gallery', onClick: () => setLightboxPhoto(null) },
+      h('button', { className: 'photo-modal-close', onClick: () => setLightboxPhoto(null), 'aria-label': 'Close homepage photos', title: 'Close photos' }, h(IconClose)),
+      h('button', { className: 'photo-modal-nav photo-modal-prev', onClick: event => { event.stopPropagation(); setLightboxPhoto(index => (index - 1 + photos.length) % photos.length); }, 'aria-label': 'Previous homepage photo' }, '‹'),
+      h('img', { className: 'photo-modal-image', src: photos[lightboxPhoto], alt: `Homepage photo ${lightboxPhoto + 1}`, onClick: event => event.stopPropagation() }),
+      h('button', { className: 'photo-modal-nav photo-modal-next', onClick: event => { event.stopPropagation(); setLightboxPhoto(index => (index + 1) % photos.length); }, 'aria-label': 'Next homepage photo' }, '›'),
+      h('div', { className: 'photo-modal-counter' }, `${lightboxPhoto + 1} / ${photos.length}`),
+      h('div', { className: 'photo-modal-thumbs', onClick: event => event.stopPropagation() },
+        photos.map((photo, index) => h('button', { key: photo + index, className: `photo-modal-thumb${lightboxPhoto === index ? ' active' : ''}`, onClick: () => setLightboxPhoto(index), 'aria-label': `View homepage photo ${index + 1}` }, h('img', { src: photo, alt: '' })))
+      )
     )
   );
 }
