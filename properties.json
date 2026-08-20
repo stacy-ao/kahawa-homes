@@ -5,10 +5,10 @@
     "location": "Mombasa",
     "price": "KES 2000 / night",
     "images": [
-      "/images/house1_main.jpg",
-      "/images/house1_bedroom.jpg",
-      "/images/house1_kitchen.jpg",
-      "/images/house1_bathroom.jpg"
+      "/images/imageshouse1_main.jpg.jpeg",
+      "/images/WhatsApp Image 2026-08-20 at 15.18.25.jpeg",
+      "/images/WhatsApp Image 2026-08-20 at 15.18.26.jpeg",
+      "/images/WhatsApp Image 2026-08-20 at 15.18.53.jpeg"
     ],
     "description": "Spacious beachfront house with direct access to the sea."
   },
@@ -18,9 +18,9 @@
     "location": "Nairobi - Kahawa",
     "price": "KES 2500 / night",
     "images": [
-      "/images/house2_main.jpg",
-      "/images/house2_livingroom.jpg",
-      "/images/house2_garden.jpg"
+      "/images/imageshouse2_main.jpg.jpeg",
+      "/images/imageshouse2.jpg.jpeg",
+      "/images/WhatsApp Image 2026-08-20 at 15.18.25.jpeg"
     ],
     "description": "Quiet retreat with beautiful outdoor greenery."
   },
@@ -30,9 +30,9 @@
     "location": "Nairobi - Kahawa",
     "price": "KES 2500 / night",
     "images": [
-      "/images/house3_main.jpg",
-      "/images/house3_livingroom.jpg",
-      "/images/house3_garden.jpg"
+      "/images/imageshouse3_main.jpg.jpeg",
+      "/images/imageshouse3_bedroom.jpg.jpeg",
+      "/images/imageshouse3.jpg.jpeg"
     ],
     "description": "Quiet retreat with beautiful outdoor greenery."
   }
