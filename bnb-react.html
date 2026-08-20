@@ -913,6 +913,23 @@ function Footer() {
 /* ────────────────────────────────────────────
    APP (router)
 ──────────────────────────────────────────── */
+function normalizeProperty(property, index) {
+  const numericPrice = Number(String(property.pricePerNight ?? property.price ?? '').replace(/[^0-9.]/g, '')) || 0;
+  return {
+    ...property,
+    id: property.id ?? index + 1,
+    pricePerNight: numericPrice,
+    rating: property.rating ?? 0,
+    reviews: property.reviews ?? 0,
+    badge: property.badge ?? 'Featured home',
+    host: property.host ?? { name: 'Kahawa Homes', months: 0 },
+    images: Array.isArray(property.images) ? property.images : [],
+    amenities: Array.isArray(property.amenities) ? property.amenities : [],
+    rules: Array.isArray(property.rules) ? property.rules : [],
+    description: property.description ?? '',
+  };
+}
+
 function App() {
   const [selected, setSelected] = useState(null);
   const [search, setSearch]     = useState('');
@@ -929,7 +946,7 @@ function App() {
       .then(data => {
         const loadedProperties = Array.isArray(data) ? data : data.properties;
         if (!Array.isArray(loadedProperties)) throw new Error('properties.json must contain an array of properties');
-        setProperties(loadedProperties);
+        setProperties(loadedProperties.map(normalizeProperty));
       })
       .catch(error => {
         console.error(error);

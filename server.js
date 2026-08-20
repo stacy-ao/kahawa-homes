@@ -6,10 +6,10 @@ const PORT = 8000;
 const DEFAULT_FILE = 'bnb-react.html'; // the React page we created earlier
 
 const server = http.createServer((req, res) => {
-  const requestUrl = decodeURIComponent(req.url);
+  const requestUrl = decodeURIComponent(req.url.split('?')[0]);
   const filePath = requestUrl === '/'
     ? path.join(__dirname, DEFAULT_FILE)
-    : path.join(__dirname, requestUrl);
+    : path.join(__dirname, requestUrl.replace(/^[/\\]+/, ''));
 
   const ext = path.extname(filePath).toLowerCase();
   const mimeTypes = {
