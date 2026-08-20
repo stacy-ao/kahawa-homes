@@ -210,6 +210,8 @@
     .card-price { font-size: .9rem; margin-top: .45rem; }
     .card-price strong { font-weight: 600; }
     .card-price span { color: var(--muted); font-weight: 400; }
+    .card-tags { display: flex; gap: .35rem; flex-wrap: wrap; margin-top: .55rem; }
+    .card-tag { color: var(--muted); background: var(--cream-dark); border-radius: 9999px; padding: .22rem .5rem; font-size: .65rem; }
 
     /* ══════════════════════════════════════════
        DETAIL PAGE
@@ -236,6 +238,16 @@
       transition: background .15s;
     }
     .detail-action-btn:hover { background: var(--cream); }
+    .detail-thumbs { display: grid; grid-template-columns: repeat(4, 1fr); gap: .5rem; margin-bottom: 1.3rem; }
+    .detail-thumb { position: relative; height: 82px; overflow: hidden; border-radius: .65rem; border: 0; padding: 0; background: var(--cream-dark); cursor: pointer; }
+    .detail-thumb img { width: 100%; height: 100%; object-fit: cover; }
+    .detail-thumb-more { position: absolute; inset: 0; display: grid; place-items: center; background: rgba(20,14,11,.55); color: white; font-weight: 700; }
+    .detail-specs { display: flex; gap: .45rem; flex-wrap: wrap; margin: 1rem 0 1.5rem; }
+    .detail-spec { border: 1px solid var(--border); border-radius: 9999px; padding: .45rem .7rem; font-size: .75rem; background: var(--white); }
+    .rating-breakdown { display: grid; gap: .6rem; margin-top: .8rem; }
+    .rating-row { display: grid; grid-template-columns: 100px 1fr 28px; gap: .6rem; align-items: center; font-size: .78rem; }
+    .rating-track { height: 5px; background: var(--border); border-radius: 9999px; overflow: hidden; }
+    .rating-fill { height: 100%; background: var(--espresso); border-radius: inherit; }
 
     /* ── Photo Mosaic ── */
     .mosaic {
@@ -811,6 +823,9 @@ function PropertyCard({ prop, onClick }) {
       h('p', { className: 'card-price' },
         h('strong', null, `KSh ${prop.pricePerNight.toLocaleString()}`),
         h('span', null, ' / night')
+      ),
+      h('div', { className: 'card-tags' },
+        (prop.amenities.length ? prop.amenities.slice(0, 2) : ['Cancellation', 'Breakfast']).map(tag => h('span', { className: 'card-tag', key: tag }, tag))
       )
     )
   );
@@ -910,6 +925,19 @@ function DetailView({ prop, onBack }) {
       )
     ),
 
+    h('div', { className: 'detail-thumbs' },
+      prop.images.slice(0, 4).map((image, index) => h('button', { className: 'detail-thumb', key: image + index, onClick: () => setActiveImage(index), 'aria-label': `View photo ${index + 1}` },
+        h('img', { src: image, alt: '' }), index === 3 && prop.images.length > 4 && h('span', { className: 'detail-thumb-more' }, `${prop.images.length - 4} more`)
+      ))
+    ),
+
+    h('div', { className: 'detail-specs' },
+      h('span', { className: 'detail-spec' }, '150 m²'),
+      h('span', { className: 'detail-spec' }, `${prop.guests} guests`),
+      h('span', { className: 'detail-spec' }, `${prop.baths} bath`),
+      h('span', { className: 'detail-spec' }, `${prop.beds} beds`)
+    ),
+
     // Mosaic
     h('div', { className: 'mosaic' },
       h('div', { className: 'mosaic-main' },
@@ -950,6 +978,13 @@ function DetailView({ prop, onBack }) {
               h('span', null, `${prop.reviews} reviews`)
             )
           )
+        ),
+
+        h('h3', { style: { fontFamily: 'var(--serif)', fontSize: '1.25rem', marginBottom: '.8rem' } }, 'Ratings & reviews'),
+        h('div', { className: 'rating-breakdown' },
+          [['Communication', 5.0], ['Cleanliness', 4.9], ['Location', prop.rating || 4.8]].map(([label, score]) => h('div', { className: 'rating-row', key: label },
+            h('span', null, label), h('span', { className: 'rating-track' }, h('span', { className: 'rating-fill', style: { width: `${Math.min(100, score * 20)}%` } })), h('strong', null, score.toFixed(1))
+          ))
         ),
 
         h('hr', { className: 'divider' }),
@@ -1095,6 +1130,11 @@ function normalizeProperty(property, index) {
   return {
     ...property,
     id: property.id ?? index + 1,
+    type: property.type ?? 'Home',
+    guests: property.guests ?? 2,
+    bedrooms: property.bedrooms ?? 1,
+    beds: property.beds ?? 1,
+    baths: property.baths ?? 1,
     pricePerNight: numericPrice,
     rating: property.rating ?? 0,
     reviews: property.reviews ?? 0,
