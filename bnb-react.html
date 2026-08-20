@@ -630,7 +630,7 @@ function Nav({ onLogoClick }) {
 /* ────────────────────────────────────────────
    FILTER BAR
 ──────────────────────────────────────────── */
-const filters = ['All','Apartments','Villas','Cottages','Lofts','Studios','Beachfront'];
+const filters = ['All locations', 'Bamburi', 'Nyali', 'Old Town', 'Diani Beach', 'Tudor', 'Kilifi Town'];
 function FilterBar({ active, onChange }) {
   return h('div', { className: 'filter-bar' },
     filters.map(f => h('button', { key: f, className: `chip${active === f ? ' active' : ''}`, onClick: () => onChange(f) }, f))
@@ -669,12 +669,13 @@ function PropertyCard({ prop, onClick }) {
 /* ────────────────────────────────────────────
    HOME VIEW
 ──────────────────────────────────────────── */
-function HomeView({ onSelect }) {
-  const [filter, setFilter] = useState('All');
-  const filtered = filter === 'All' ? properties : properties;
+function HomeView({ onSelect, filter }) {
+  const filtered = filter === 'All locations'
+    ? properties
+    : properties.filter(prop => prop.location.startsWith(`${filter},`) || prop.location === filter);
   return h('div', { className: 'home-wrap fade-in' },
     h('div', { className: 'section-heading' },
-      `Popular homes in Mombasa →`
+      `${filter === 'All locations' ? 'Popular homes' : `Homes in ${filter}`} →`
     ),
     h('div', { className: 'prop-grid' },
       filtered.map(p => h(PropertyCard, { key: p.id, prop: p, onClick: () => onSelect(p) }))
@@ -900,7 +901,7 @@ function App() {
     !selected && h(FilterBar, { active: filter, onChange: setFilter }),
     selected
       ? h(DetailView, { prop: selected, onBack: goHome })
-      : h(HomeView, { onSelect: goDetail }),
+      : h(HomeView, { onSelect: goDetail, filter }),
     h(Footer, null)
   );
 }
