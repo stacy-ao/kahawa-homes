@@ -251,6 +251,7 @@
     }
     .mosaic-main { grid-row: 1 / 3; }
     .mosaic img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .mosaic img { cursor: zoom-in; }
     .mosaic-main img { height: 480px; }
     .mosaic-side { display: grid; grid-template-rows: 1fr 1fr; gap: .5rem; }
     .mosaic-side img { height: 234px; }
@@ -265,6 +266,38 @@
       transition: background .2s;
     }
     .mosaic-more-btn:hover { background: var(--cream); }
+
+    /* ── Photo Lightbox ── */
+    .photo-modal {
+      position: fixed; inset: 0; z-index: 20;
+      background: rgba(20, 14, 11, .94);
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      padding: 1.5rem;
+    }
+    .photo-modal-close {
+      position: absolute; top: 1rem; right: 1rem;
+      width: 42px; height: 42px; border: 1px solid rgba(255,255,255,.35);
+      border-radius: 50%; background: rgba(255,255,255,.12); color: white;
+      font-size: 1.6rem; line-height: 1; cursor: pointer;
+    }
+    .photo-modal-close:hover { background: rgba(255,255,255,.25); }
+    .photo-modal-image {
+      max-width: min(92vw, 1100px); max-height: 76vh;
+      object-fit: contain; border-radius: .4rem;
+    }
+    .photo-modal-nav {
+      position: absolute; top: 50%; transform: translateY(-50%);
+      width: 42px; height: 42px; border: none; border-radius: 50%;
+      background: white; color: var(--espresso); font-size: 1.5rem; cursor: pointer;
+    }
+    .photo-modal-prev { left: 1.2rem; }
+    .photo-modal-next { right: 1.2rem; }
+    .photo-modal-counter { color: white; margin: .8rem 0; font-size: .85rem; }
+    .photo-modal-thumbs { display: flex; gap: .5rem; max-width: 92vw; overflow-x: auto; padding: .2rem; }
+    .photo-modal-thumb { width: 68px; height: 48px; flex: 0 0 auto; padding: 0; border: 2px solid transparent; border-radius: .25rem; overflow: hidden; background: none; cursor: pointer; }
+    .photo-modal-thumb.active { border-color: var(--gold); }
+    .photo-modal-thumb img { width: 100%; height: 100%; object-fit: cover; }
 
     /* ── Detail Body ── */
     .detail-body {
@@ -637,7 +670,6 @@ function Nav({ onLogoClick, search, onSearch }) {
       h('button', { className: 'nav-search-btn', type: 'submit', 'aria-label': 'Search' }, h(IconSearch))
     ),
     h('div', { className: 'nav-right' },
-      h('button', { className: 'nav-link' }, 'Become a host'),
       h('button', { className: 'nav-avatar', 'aria-label': 'Menu' }, h(IconUser))
     )
   );
@@ -715,6 +747,18 @@ function DetailView({ prop, onBack }) {
   const [checkOut, setCheckOut] = useState('');
   const [guests, setGuests]     = useState(1);
   const [name, setName]         = useState('');
+  const [activeImage, setActiveImage] = useState(null);
+
+  useEffect(() => {
+    if (activeImage === null) return undefined;
+    const handleKeyDown = event => {
+      if (event.key === 'Escape') setActiveImage(null);
+      if (event.key === 'ArrowLeft') setActiveImage(index => (index - 1 + prop.images.length) % prop.images.length);
+      if (event.key === 'ArrowRight') setActiveImage(index => (index + 1) % prop.images.length);
+    };
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [activeImage, prop.images.length]);
 
   // Calculate nights + total
   const nights = checkIn && checkOut
@@ -744,13 +788,13 @@ function DetailView({ prop, onBack }) {
     // Mosaic
     h('div', { className: 'mosaic' },
       h('div', { className: 'mosaic-main' },
-        h('img', { src: prop.images[0], alt: prop.name })
+        h('img', { src: prop.images[0], alt: prop.name, onClick: () => setActiveImage(0) })
       ),
       h('div', { className: 'mosaic-side' },
-        h('img', { src: prop.images[1], alt: '' }),
+        h('img', { src: prop.images[1], alt: '', onClick: () => setActiveImage(1) }),
         h('div', { className: 'mosaic-more-wrap' },
-          h('img', { src: prop.images[2], alt: '' }),
-          h('button', { className: 'mosaic-more-btn' }, h(IconGrid), ` Show all photos`)
+          h('img', { src: prop.images[2], alt: '', onClick: () => setActiveImage(2) }),
+          h('button', { className: 'mosaic-more-btn', onClick: () => setActiveImage(0) }, h(IconGrid), ` Show all photos`)
         )
       )
     ),
@@ -881,6 +925,16 @@ function DetailView({ prop, onBack }) {
             )
           )
         )
+      )
+    ),
+    activeImage !== null && h('div', { className: 'photo-modal', role: 'dialog', 'aria-modal': 'true', 'aria-label': `${prop.name} photo gallery`, onClick: () => setActiveImage(null) },
+      h('button', { className: 'photo-modal-close', onClick: () => setActiveImage(null), 'aria-label': 'Close photos' }, '×'),
+      prop.images.length > 1 && h('button', { className: 'photo-modal-nav photo-modal-prev', onClick: event => { event.stopPropagation(); setActiveImage(index => (index - 1 + prop.images.length) % prop.images.length); }, 'aria-label': 'Previous photo' }, '‹'),
+      h('img', { className: 'photo-modal-image', src: prop.images[activeImage], alt: `${prop.name} photo ${activeImage + 1}`, onClick: event => event.stopPropagation() }),
+      prop.images.length > 1 && h('button', { className: 'photo-modal-nav photo-modal-next', onClick: event => { event.stopPropagation(); setActiveImage(index => (index + 1) % prop.images.length); }, 'aria-label': 'Next photo' }, '›'),
+      h('div', { className: 'photo-modal-counter' }, `${activeImage + 1} / ${prop.images.length}`),
+      h('div', { className: 'photo-modal-thumbs', onClick: event => event.stopPropagation() },
+        prop.images.map((image, index) => h('button', { key: image + index, className: `photo-modal-thumb${activeImage === index ? ' active' : ''}`, onClick: () => setActiveImage(index), 'aria-label': `View photo ${index + 1}` }, h('img', { src: image, alt: '' })))
       )
     )
   );
