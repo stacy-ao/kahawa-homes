@@ -5,10 +5,10 @@
     "location": "Mombasa",
     "price": "KES 2000 / night",
     "images": [
-      "/images/imageshouse1_main.jpg.jpeg",
-      "/images/WhatsApp Image 2026-08-20 at 15.18.25.jpeg",
-      "/images/WhatsApp Image 2026-08-20 at 15.18.26.jpeg",
-      "/images/WhatsApp Image 2026-08-20 at 15.18.53.jpeg"
+      "https://raw.githubusercontent.com/stacy-ao/kahawa-homes/main/images/imageshouse1_main.jpg.jpeg",
+      "https://raw.githubusercontent.com/stacy-ao/kahawa-homes/main/images/WhatsApp%20Image%202026-08-20%20at%2015.18.25.jpeg",
+      "https://raw.githubusercontent.com/stacy-ao/kahawa-homes/main/images/WhatsApp%20Image%202026-08-20%20at%2015.18.26.jpeg",
+      "https://raw.githubusercontent.com/stacy-ao/kahawa-homes/main/images/WhatsApp%20Image%202026-08-20%20at%2015.18.53.jpeg"
     ],
     "description": "Spacious beachfront house with direct access to the sea."
   },
@@ -18,9 +18,9 @@
     "location": "Nairobi - Kahawa",
     "price": "KES 2500 / night",
     "images": [
-      "/images/imageshouse2_main.jpg.jpeg",
-      "/images/imageshouse2.jpg.jpeg",
-      "/images/WhatsApp Image 2026-08-20 at 15.18.25.jpeg"
+      "https://raw.githubusercontent.com/stacy-ao/kahawa-homes/main/images/imageshouse2_main.jpg.jpeg",
+      "https://raw.githubusercontent.com/stacy-ao/kahawa-homes/main/images/imageshouse2.jpg.jpeg",
+      "https://raw.githubusercontent.com/stacy-ao/kahawa-homes/main/images/WhatsApp%20Image%202026-08-20%20at%2015.18.25.jpeg"
     ],
     "description": "Quiet retreat with beautiful outdoor greenery."
   },
@@ -30,9 +30,9 @@
     "location": "Nairobi - Kahawa",
     "price": "KES 2500 / night",
     "images": [
-      "/images/imageshouse3_main.jpg.jpeg",
-      "/images/imageshouse3_bedroom.jpg.jpeg",
-      "/images/imageshouse3.jpg.jpeg"
+      "https://raw.githubusercontent.com/stacy-ao/kahawa-homes/main/images/imageshouse3_main.jpg.jpeg",
+      "https://raw.githubusercontent.com/stacy-ao/kahawa-homes/main/images/imageshouse3_bedroom.jpg.jpeg",
+      "https://raw.githubusercontent.com/stacy-ao/kahawa-homes/main/images/imageshouse3.jpg.jpeg"
     ],
     "description": "Quiet retreat with beautiful outdoor greenery."
   }
