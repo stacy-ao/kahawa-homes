@@ -1,0 +1,911 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Kahawa Homes – Boutique B&B</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="Kahawa Homes – Luxury Bed & Breakfast in Kenya. Browse and book directly via WhatsApp.">
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,700;1,500&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    /* ══════════════════════════════════════════
+       DESIGN TOKENS
+    ══════════════════════════════════════════ */
+    :root {
+      --serif:   'Playfair Display', Georgia, serif;
+      --sans:    'Inter', system-ui, sans-serif;
+      --cream:        #f7f3ec;
+      --cream-dark:   #ede6d6;
+      --espresso:     #1e120a;
+      --espresso-mid: #4a2c17;
+      --espresso-lt:  #7a5c3e;
+      --gold:         #c9a96e;
+      --gold-lt:      #e8d5b0;
+      --white:        #ffffff;
+      --border:       #e8e0d0;
+      --muted:        #6b5744;
+      --green:        #25d366; /* WhatsApp */
+      --shadow-xs: 0 1px 4px rgba(30,18,10,.08);
+      --shadow-sm: 0 2px 12px rgba(30,18,10,.10);
+      --shadow-md: 0 6px 24px rgba(30,18,10,.14);
+      --shadow-lg: 0 16px 48px rgba(30,18,10,.18);
+      --r: .75rem;
+      --r-pill: 50px;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body { font-family: var(--sans); background: var(--cream); color: var(--espresso); line-height: 1.65; -webkit-font-smoothing: antialiased; }
+    button { font-family: inherit; cursor: pointer; }
+    img { display: block; max-width: 100%; }
+    input, select { font-family: inherit; }
+
+    /* ══════════════════════════════════════════
+       SCROLLBAR (webkit)
+    ══════════════════════════════════════════ */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: var(--cream); }
+    ::-webkit-scrollbar-thumb { background: var(--gold-lt); border-radius: 99px; }
+
+    /* ══════════════════════════════════════════
+       NAV
+    ══════════════════════════════════════════ */
+    .nav {
+      position: sticky; top: 0; z-index: 200;
+      background: var(--white);
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+      padding: .9rem 2rem;
+      gap: 1rem;
+    }
+    .nav-logo {
+      font-family: var(--serif);
+      font-size: 1.3rem; font-weight: 700;
+      color: var(--espresso);
+      white-space: nowrap;
+      cursor: pointer;
+      user-select: none;
+    }
+    .nav-logo span { color: var(--gold); }
+    .nav-search {
+      display: flex; align-items: center;
+      background: var(--white);
+      border: 1.5px solid var(--border);
+      border-radius: var(--r-pill);
+      overflow: hidden;
+      box-shadow: var(--shadow-xs);
+      flex: 1; max-width: 520px;
+    }
+    .nav-search-pill {
+      display: flex; align-items: center;
+      padding: .55rem 1.1rem;
+      gap: .5rem;
+      cursor: pointer;
+      font-size: .82rem; font-weight: 500;
+      border-right: 1px solid var(--border);
+      color: var(--espresso);
+      transition: background .15s;
+      white-space: nowrap;
+    }
+    .nav-search-pill:last-of-type { border-right: none; }
+    .nav-search-pill:hover { background: var(--cream); }
+    .nav-search-pill svg { color: var(--espresso-lt); flex-shrink: 0; }
+    .nav-search-btn {
+      margin: .35rem .35rem .35rem 0;
+      width: 36px; height: 36px; border-radius: 50%;
+      background: var(--espresso);
+      border: none; color: white;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+      transition: background .2s;
+    }
+    .nav-search-btn:hover { background: var(--espresso-mid); }
+    .nav-right { display: flex; align-items: center; gap: .8rem; }
+    .nav-link {
+      font-size: .85rem; font-weight: 500; color: var(--espresso);
+      background: none; border: none; padding: .4rem .8rem; border-radius: var(--r-pill);
+      transition: background .15s;
+      white-space: nowrap;
+    }
+    .nav-link:hover { background: var(--cream); }
+    .nav-avatar {
+      width: 36px; height: 36px; border-radius: 50%;
+      background: var(--espresso); display: flex; align-items: center; justify-content: center;
+      border: none;
+    }
+    .nav-avatar svg { color: white; }
+
+    /* ══════════════════════════════════════════
+       FILTER CHIPS
+    ══════════════════════════════════════════ */
+    .filter-bar {
+      background: var(--white);
+      border-bottom: 1px solid var(--border);
+      padding: .75rem 2rem;
+      display: flex; gap: .6rem;
+      overflow-x: auto; scrollbar-width: none;
+    }
+    .filter-bar::-webkit-scrollbar { display: none; }
+    .chip {
+      flex-shrink: 0;
+      padding: .45rem 1.1rem;
+      border-radius: var(--r-pill);
+      border: 1.5px solid var(--border);
+      background: var(--white);
+      font-size: .8rem; font-weight: 500;
+      color: var(--espresso);
+      transition: all .18s;
+    }
+    .chip:hover { border-color: var(--espresso); }
+    .chip.active { background: var(--espresso); border-color: var(--espresso); color: var(--white); }
+
+    /* ══════════════════════════════════════════
+       HOMEPAGE — PROPERTY GRID
+    ══════════════════════════════════════════ */
+    .home-wrap { max-width: 1280px; margin: 0 auto; padding: 2rem; }
+    .section-heading {
+      font-family: var(--serif);
+      font-size: 1.4rem; font-weight: 700;
+      margin-bottom: 1.5rem;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .prop-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 1.6rem;
+    }
+
+    /* ── Card ── */
+    .prop-card {
+      border-radius: var(--r);
+      overflow: visible;
+      cursor: pointer;
+      position: relative;
+      transition: transform .25s;
+    }
+    .prop-card:hover { transform: translateY(-3px); }
+    .prop-card:hover .card-img img { transform: scale(1.04); }
+    .card-img {
+      position: relative;
+      border-radius: var(--r);
+      overflow: hidden;
+      aspect-ratio: 4/3;
+      background: var(--cream-dark);
+    }
+    .card-img img { width: 100%; height: 100%; object-fit: cover; transition: transform .4s; }
+    .card-badge {
+      position: absolute; top: .7rem; left: .7rem;
+      background: var(--white);
+      font-size: .72rem; font-weight: 600;
+      padding: .28rem .7rem; border-radius: var(--r-pill);
+      box-shadow: var(--shadow-xs);
+      display: flex; align-items: center; gap: .3rem;
+    }
+    .card-badge::before { content: '🏡'; font-size: .7rem; }
+    .card-heart {
+      position: absolute; top: .7rem; right: .7rem;
+      width: 32px; height: 32px; border-radius: 50%;
+      background: rgba(255,255,255,.85); border: none;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1rem; transition: transform .2s, background .2s;
+      box-shadow: var(--shadow-xs);
+    }
+    .card-heart:hover { transform: scale(1.15); background: white; }
+    .card-body { padding: .85rem .1rem .4rem; }
+    .card-top { display: flex; justify-content: space-between; align-items: flex-start; gap: .5rem; }
+    .card-name { font-weight: 600; font-size: .95rem; color: var(--espresso); }
+    .card-rating { display: flex; align-items: center; gap: .25rem; font-size: .82rem; font-weight: 500; flex-shrink: 0; }
+    .card-rating svg { color: var(--espresso); }
+    .card-location { font-size: .82rem; color: var(--muted); margin: .1rem 0; }
+    .card-price { font-size: .9rem; margin-top: .45rem; }
+    .card-price strong { font-weight: 600; }
+    .card-price span { color: var(--muted); font-weight: 400; }
+
+    /* ══════════════════════════════════════════
+       DETAIL PAGE
+    ══════════════════════════════════════════ */
+    .detail-wrap { max-width: 1100px; margin: 0 auto; padding: 1.5rem 2rem 4rem; }
+    .detail-back {
+      display: inline-flex; align-items: center; gap: .4rem;
+      background: none; border: none;
+      font-size: .9rem; font-weight: 500;
+      color: var(--espresso);
+      padding: .5rem 0; margin-bottom: 1.2rem;
+      text-decoration: underline; text-underline-offset: 3px;
+      transition: color .2s;
+    }
+    .detail-back:hover { color: var(--gold); }
+    .detail-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; margin-bottom: 1.2rem; flex-wrap: wrap; }
+    .detail-title { font-family: var(--serif); font-size: clamp(1.5rem, 3vw, 2rem); font-weight: 700; }
+    .detail-actions { display: flex; gap: .8rem; }
+    .detail-action-btn {
+      display: flex; align-items: center; gap: .4rem;
+      background: none; border: none; font-size: .85rem; font-weight: 500;
+      padding: .4rem .8rem; border-radius: var(--r);
+      text-decoration: underline; text-underline-offset: 3px;
+      transition: background .15s;
+    }
+    .detail-action-btn:hover { background: var(--cream); }
+
+    /* ── Photo Mosaic ── */
+    .mosaic {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: auto auto;
+      gap: .5rem;
+      border-radius: var(--r);
+      overflow: hidden;
+      margin-bottom: 2rem;
+      max-height: 480px;
+    }
+    .mosaic-main { grid-row: 1 / 3; }
+    .mosaic img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .mosaic-main img { height: 480px; }
+    .mosaic-side { display: grid; grid-template-rows: 1fr 1fr; gap: .5rem; }
+    .mosaic-side img { height: 234px; }
+    .mosaic-more-wrap { position: relative; }
+    .mosaic-more-wrap img { height: 234px; }
+    .mosaic-more-btn {
+      position: absolute; bottom: .9rem; right: .9rem;
+      background: var(--white); border: 1.5px solid var(--espresso);
+      border-radius: .45rem; padding: .45rem .9rem;
+      font-size: .8rem; font-weight: 600;
+      display: flex; align-items: center; gap: .4rem;
+      transition: background .2s;
+    }
+    .mosaic-more-btn:hover { background: var(--cream); }
+
+    /* ── Detail Body ── */
+    .detail-body {
+      display: grid;
+      grid-template-columns: 1fr 380px;
+      gap: 3.5rem;
+      align-items: start;
+    }
+    @media (max-width: 860px) {
+      .detail-body { grid-template-columns: 1fr; }
+      .booking-sticky { position: static !important; }
+    }
+
+    .detail-meta { font-size: 1rem; color: var(--muted); margin-bottom: 1.2rem; }
+    .detail-badges {
+      display: flex; gap: .8rem; flex-wrap: wrap;
+      margin-bottom: 1.5rem;
+    }
+    .detail-badge {
+      display: flex; align-items: center; gap: .5rem;
+      border: 1.5px solid var(--border); border-radius: var(--r);
+      padding: .65rem 1rem; font-size: .82rem;
+    }
+    .detail-badge-icon { font-size: 1.3rem; }
+    .detail-badge-text strong { display: block; font-size: .82rem; }
+    .detail-badge-text span { font-size: .75rem; color: var(--muted); }
+
+    .divider { border: none; border-top: 1px solid var(--border); margin: 1.5rem 0; }
+
+    .host-row { display: flex; align-items: center; gap: 1rem; margin-bottom: 1.5rem; }
+    .host-avatar {
+      width: 48px; height: 48px; border-radius: 50%;
+      background: var(--espresso);
+      display: flex; align-items: center; justify-content: center;
+      font-family: var(--serif); font-size: 1.2rem; color: white; font-weight: 700;
+      flex-shrink: 0;
+    }
+    .host-info strong { font-size: .95rem; display: block; }
+    .host-info span { font-size: .8rem; color: var(--muted); }
+
+    .detail-desc { font-size: .95rem; line-height: 1.75; color: var(--espresso-mid); }
+
+    .amenities-grid-detail {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 1rem; margin-top: 1rem;
+    }
+    .amenity-row { display: flex; align-items: center; gap: .75rem; font-size: .9rem; }
+    .amenity-row svg { flex-shrink: 0; color: var(--espresso-mid); }
+
+    .rules-list { list-style: none; display: flex; flex-direction: column; gap: .6rem; margin-top: .8rem; }
+    .rules-list li { display: flex; align-items: center; gap: .6rem; font-size: .9rem; color: var(--espresso-mid); }
+
+    /* ── Booking Card (sticky) ── */
+    .booking-sticky {
+      position: sticky;
+      top: 90px;
+    }
+    .booking-card {
+      background: var(--white);
+      border: 1.5px solid var(--border);
+      border-radius: var(--r);
+      padding: 1.6rem;
+      box-shadow: var(--shadow-md);
+    }
+    .booking-price { font-size: 1.3rem; font-weight: 700; margin-bottom: 1.2rem; }
+    .booking-price span { font-size: .9rem; font-weight: 400; color: var(--muted); }
+    .date-row {
+      display: grid; grid-template-columns: 1fr 1fr;
+      border: 1.5px solid var(--border); border-radius: var(--r);
+      overflow: hidden; margin-bottom: .8rem;
+    }
+    .date-field {
+      padding: .7rem .9rem;
+      border: none; outline: none;
+      font-family: inherit; font-size: .82rem;
+      background: var(--white);
+      cursor: pointer;
+    }
+    .date-field:first-child { border-right: 1px solid var(--border); }
+    .date-field:focus { background: var(--cream); }
+    .date-label { font-size: .68rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; display: block; margin-bottom: .2rem; }
+    .guests-field {
+      width: 100%; padding: .75rem .9rem;
+      border: 1.5px solid var(--border); border-radius: var(--r);
+      font-family: inherit; font-size: .9rem;
+      background: var(--white); cursor: pointer;
+      margin-bottom: 1rem; appearance: none;
+    }
+    .name-field {
+      width: 100%; padding: .75rem .9rem;
+      border: 1.5px solid var(--border); border-radius: var(--r);
+      font-family: inherit; font-size: .9rem;
+      background: var(--white); margin-bottom: 1rem;
+    }
+    .name-field:focus, .guests-field:focus { outline: none; border-color: var(--gold); }
+    .wa-btn {
+      width: 100%; padding: .95rem;
+      background: var(--green);
+      border: none; border-radius: var(--r);
+      color: white; font-weight: 700; font-size: 1rem;
+      display: flex; align-items: center; justify-content: center; gap: .6rem;
+      transition: background .2s, transform .15s;
+      margin-bottom: .8rem;
+    }
+    .wa-btn:hover { background: #1ebe5d; transform: translateY(-1px); }
+    .wa-btn svg { flex-shrink: 0; }
+    .booking-note { text-align: center; font-size: .78rem; color: var(--muted); }
+    .booking-note a { color: var(--espresso); font-weight: 500; text-decoration: underline; }
+    .booking-breakdown { border-top: 1px solid var(--border); margin-top: 1rem; padding-top: 1rem; }
+    .booking-breakdown-row {
+      display: flex; justify-content: space-between;
+      font-size: .88rem; padding: .3rem 0;
+      color: var(--espresso-mid);
+    }
+    .booking-breakdown-row.total {
+      font-weight: 700; font-size: .95rem;
+      color: var(--espresso); border-top: 1px solid var(--border);
+      margin-top: .5rem; padding-top: .7rem;
+    }
+
+    /* ══════════════════════════════════════════
+       FOOTER
+    ══════════════════════════════════════════ */
+    footer {
+      background: var(--espresso); color: rgba(255,255,255,.75);
+      padding: 3rem 2rem 2rem; text-align: center;
+    }
+    .footer-logo { font-family: var(--serif); font-size: 1.4rem; color: white; margin-bottom: .3rem; }
+    .footer-logo span { color: var(--gold); }
+    .footer-sub { font-size: .78rem; letter-spacing: .18em; text-transform: uppercase; color: var(--gold); margin-bottom: 1.8rem; }
+    .footer-links { display: flex; flex-wrap: wrap; justify-content: center; gap: 1.2rem; margin-bottom: 1.5rem; }
+    .footer-links a {
+      color: rgba(255,255,255,.75); font-size: .85rem;
+      display: flex; align-items: center; gap: .4rem;
+      transition: color .2s;
+    }
+    .footer-links a:hover { color: var(--gold); }
+    .footer-socials { display: flex; justify-content: center; gap: 1rem; margin-bottom: 1.8rem; }
+    .footer-socials a {
+      width: 38px; height: 38px; border-radius: 50%;
+      border: 1.5px solid rgba(255,255,255,.2);
+      display: flex; align-items: center; justify-content: center;
+      transition: border-color .2s, background .2s;
+    }
+    .footer-socials a:hover { background: var(--gold); border-color: var(--gold); }
+    .footer-socials svg { width: 17px; height: 17px; fill: white; }
+    .footer-copy { font-size: .75rem; opacity: .4; }
+
+    /* ══════════════════════════════════════════
+       RESPONSIVE
+    ══════════════════════════════════════════ */
+    @media (max-width: 680px) {
+      .home-wrap { padding: 1.2rem; }
+      .detail-wrap { padding: 1rem 1.2rem 3rem; }
+      .nav { padding: .8rem 1.2rem; }
+      .nav-search { display: none; }
+      .filter-bar { padding: .6rem 1.2rem; }
+      .mosaic { grid-template-columns: 1fr; max-height: none; }
+      .mosaic-main img { height: 260px; }
+      .mosaic-side { display: none; }
+      .amenities-grid-detail { grid-template-columns: 1fr; }
+    }
+
+    /* ══════════════════════════════════════════
+       UTILITY
+    ══════════════════════════════════════════ */
+    .fade-in { animation: fadeIn .3s ease; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+  </style>
+</head>
+<body>
+<div id="root"></div>
+<script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+<script>
+const { useState } = React;
+const h = React.createElement;
+
+/* ────────────────────────────────────────────
+   DATA
+──────────────────────────────────────────── */
+const WA_NUMBER = '254712345678'; // ← Replace with real number (no + or spaces)
+
+const properties = [
+  {
+    id: 1,
+    name: 'Radium Stay Inn',
+    type: 'Entire apartment',
+    location: 'Nyali, Mombasa',
+    guests: 6, bedrooms: 3, beds: 4, baths: 3,
+    pricePerNight: 12500,
+    rating: 4.89, reviews: 42,
+    badge: 'Guest Favourite',
+    host: { name: 'Nelly', months: 18 },
+    images: [
+      'https://picsum.photos/800/600?random=31',
+      'https://picsum.photos/800/600?random=32',
+      'https://picsum.photos/800/600?random=33',
+      'https://picsum.photos/800/600?random=34',
+      'https://picsum.photos/800/600?random=35',
+    ],
+    description: `Step into Radium Stay Inn — a beautifully curated apartment nestled in the serene heart of Nyali. Every detail has been considered to deliver a premium, home-away-from-home experience.\n\nThe space features a fully-equipped kitchen, air-conditioned bedrooms with luxury linens, a private balcony with sea views, and dedicated parking. Perfect for families, business travellers, or anyone seeking rest and comfort in Mombasa.`,
+    amenities: ['High-Speed WiFi','Air Conditioning','Full Kitchen','DSTV & Netflix','Luxurious Toiletries','USB Charging Ports','Daily Room Service','Secure Parking','Swimming Pool Access','24/7 Security'],
+    rules: ['No smoking','No parties or events','Check-in: 14:00 – 22:00','Checkout: 10:00','Pets allowed with prior notice'],
+  },
+  {
+    id: 2,
+    name: 'The Garden Suite',
+    type: 'Entire villa',
+    location: 'Bamburi, Mombasa',
+    guests: 4, bedrooms: 2, beds: 3, baths: 2,
+    pricePerNight: 9800,
+    rating: 4.95, reviews: 28,
+    badge: 'Guest Favourite',
+    host: { name: 'Nelly', months: 18 },
+    images: [
+      'https://picsum.photos/800/600?random=41',
+      'https://picsum.photos/800/600?random=42',
+      'https://picsum.photos/800/600?random=43',
+      'https://picsum.photos/800/600?random=44',
+      'https://picsum.photos/800/600?random=45',
+    ],
+    description: `The Garden Suite is a tranquil hideaway wrapped in lush tropical greenery. Wake up to birdsong, enjoy breakfast on your private garden terrace, and unwind in the beautifully designed living spaces.\n\nIdeal for couples and small families seeking a peaceful Mombasa escape, with easy access to Bamburi Beach just 5 minutes away.`,
+    amenities: ['High-Speed WiFi','Air Conditioning','Private Garden','DSTV & Netflix','Luxurious Toiletries','Outdoor BBQ Area','Daily Housekeeping','Secure Parking','Ocean View Balcony','24/7 Security'],
+    rules: ['No smoking indoors','Quiet hours 22:00 – 08:00','Check-in: 13:00 – 21:00','Checkout: 11:00','No unregistered guests'],
+  },
+  {
+    id: 3,
+    name: 'Lighthouse Loft',
+    type: 'Entire loft',
+    location: 'Old Town, Mombasa',
+    guests: 3, bedrooms: 1, beds: 2, baths: 1,
+    pricePerNight: 7200,
+    rating: 4.76, reviews: 19,
+    badge: 'Guest Favourite',
+    host: { name: 'Nelly', months: 18 },
+    images: [
+      'https://picsum.photos/800/600?random=51',
+      'https://picsum.photos/800/600?random=52',
+      'https://picsum.photos/800/600?random=53',
+      'https://picsum.photos/800/600?random=54',
+      'https://picsum.photos/800/600?random=55',
+    ],
+    description: `Lighthouse Loft is a chic, architecturally unique space perched in the historic Old Town. Exposed brickwork, soaring ceilings, and curated décor create an atmosphere that is both artistic and deeply comfortable.\n\nWalk to Fort Jesus, the Old Town harbour, and some of the best seafood restaurants Mombasa has to offer — all within minutes of your front door.`,
+    amenities: ['High-Speed WiFi','Air Conditioning','Rooftop Terrace','DSTV & Netflix','Artisan Coffee Station','USB Charging Ports','Weekly Housekeeping','Bicycle Access','Historic Views','Keyless Entry'],
+    rules: ['No smoking','Noise curfew 23:00','Check-in: 14:00 – 20:00','Checkout: 10:00','Maximum 3 guests'],
+  },
+  {
+    id: 4,
+    name: 'Bahari Beach House',
+    type: 'Entire house',
+    location: 'Diani Beach, Kwale',
+    guests: 8, bedrooms: 4, beds: 5, baths: 4,
+    pricePerNight: 22000,
+    rating: 5.0, reviews: 11,
+    badge: 'Guest Favourite',
+    host: { name: 'Nelly', months: 18 },
+    images: [
+      'https://picsum.photos/800/600?random=61',
+      'https://picsum.photos/800/600?random=62',
+      'https://picsum.photos/800/600?random=63',
+      'https://picsum.photos/800/600?random=64',
+      'https://picsum.photos/800/600?random=65',
+    ],
+    description: `Bahari Beach House is the crown jewel of Kahawa Homes — a magnificent 4-bedroom property sitting directly on the white sands of Diani Beach. The ultimate luxury escape with panoramic Indian Ocean views from every room.\n\nHost unforgettable family gatherings or milestone celebrations with a private chef option available on request. This is not just a stay — it's an experience.`,
+    amenities: ['Beachfront Access','Private Pool','High-Speed WiFi','Air Conditioning','Full Gourmet Kitchen','DSTV & Netflix','Private Chef (on request)','Luxury Toiletries','Daily Housekeeping','Beach Volleyball Court'],
+    rules: ['No shoes indoors','Quiet hours 23:00','Check-in: 15:00 – 21:00','Checkout: 11:00','Pets by arrangement only'],
+  },
+  {
+    id: 5,
+    name: 'Serene Studio',
+    type: 'Private room',
+    location: 'Tudor, Mombasa',
+    guests: 2, bedrooms: 1, beds: 1, baths: 1,
+    pricePerNight: 4500,
+    rating: 4.92, reviews: 35,
+    badge: 'Guest Favourite',
+    host: { name: 'Nelly', months: 18 },
+    images: [
+      'https://picsum.photos/800/600?random=71',
+      'https://picsum.photos/800/600?random=72',
+      'https://picsum.photos/800/600?random=73',
+      'https://picsum.photos/800/600?random=74',
+      'https://picsum.photos/800/600?random=75',
+    ],
+    description: `Serene Studio is the perfect compact retreat for solo travellers or couples looking for great value without compromising on quality. The space is thoughtfully furnished with a memory foam bed, designer bathroom, and a private kitchenette.\n\nLocated in the calm residential area of Tudor, you're well connected to the city centre while enjoying quiet, neighbourhood tranquillity.`,
+    amenities: ['High-Speed WiFi','Air Conditioning','Private Kitchenette','Smart TV','Luxury Toiletries','USB Charging Ports','Weekly Housekeeping','Secure Parking','Workspace Desk','Iron & Ironing Board'],
+    rules: ['No smoking','No visitors after 22:00','Check-in: 13:00 – 20:00','Checkout: 10:00','No parties'],
+  },
+  {
+    id: 6,
+    name: 'Coral Reef Cottage',
+    type: 'Entire cottage',
+    location: 'Kilifi Town',
+    guests: 5, bedrooms: 2, beds: 3, baths: 2,
+    pricePerNight: 11000,
+    rating: 4.88, reviews: 22,
+    badge: 'Guest Favourite',
+    host: { name: 'Nelly', months: 18 },
+    images: [
+      'https://picsum.photos/800/600?random=81',
+      'https://picsum.photos/800/600?random=82',
+      'https://picsum.photos/800/600?random=83',
+      'https://picsum.photos/800/600?random=84',
+      'https://picsum.photos/800/600?random=85',
+    ],
+    description: `Coral Reef Cottage is a charming two-bedroom retreat in picturesque Kilifi — one of Kenya's most beautiful coastal towns. Enjoy a sunset from the creek-view terrace or kayak directly from the property.\n\nThe cottage features a hand-crafted interior with local Swahili influences, creating a warm and authentic coastal atmosphere you won't find anywhere else.`,
+    amenities: ['Creek Views','Kayak Access','High-Speed WiFi','Air Conditioning','Full Kitchen','DSTV & Netflix','Outdoor Dining Area','BBQ Grill','Daily Housekeeping','24/7 Security'],
+    rules: ['No shoes indoors','No smoking','Check-in: 14:00 – 21:00','Checkout: 10:00','Life jackets provided for water activities'],
+  },
+];
+
+/* ────────────────────────────────────────────
+   ICONS
+──────────────────────────────────────────── */
+const IconStar = () => h('svg',{width:14,height:14,viewBox:'0 0 24 24',fill:'currentColor'},h('path',{d:'M12 2l3.09 6.26L22 9.27l-5 4.87L18.18 21 12 17.77 5.82 21 7 14.14l-5-4.87 6.91-1.01L12 2z'}));
+const IconSearch = () => h('svg',{width:16,height:16,viewBox:'0 0 24 24',fill:'none',stroke:'currentColor',strokeWidth:2.5,strokeLinecap:'round'},h('circle',{cx:11,cy:11,r:8}),h('path',{d:'m21 21-4.35-4.35'}));
+const IconBack = () => h('svg',{width:16,height:16,viewBox:'0 0 24 24',fill:'none',stroke:'currentColor',strokeWidth:2.5,strokeLinecap:'round',strokeLinejoin:'round'},h('path',{d:'M19 12H5M12 5l-7 7 7 7'}));
+const IconShare = () => h('svg',{width:15,height:15,viewBox:'0 0 24 24',fill:'none',stroke:'currentColor',strokeWidth:2,strokeLinecap:'round'},h('path',{d:'M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8M16 6l-4-4-4 4M12 2v13'}));
+const IconHeart = () => h('svg',{width:15,height:15,viewBox:'0 0 24 24',fill:'none',stroke:'currentColor',strokeWidth:2,strokeLinecap:'round'},h('path',{d:'M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z'}));
+const IconGrid = () => h('svg',{width:14,height:14,viewBox:'0 0 24 24',fill:'none',stroke:'currentColor',strokeWidth:2,strokeLinecap:'round'},h('rect',{x:3,y:3,width:7,height:7}),h('rect',{x:14,y:3,width:7,height:7}),h('rect',{x:14,y:14,width:7,height:7}),h('rect',{x:3,y:14,width:7,height:7}));
+const IconUser = () => h('svg',{width:18,height:18,viewBox:'0 0 24 24',fill:'none',stroke:'white',strokeWidth:2,strokeLinecap:'round'},h('path',{d:'M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2'}),h('circle',{cx:12,cy:7,r:4}));
+const IconWifi = () => h('svg',{width:20,height:20,viewBox:'0 0 24 24',fill:'none',stroke:'currentColor',strokeWidth:1.8,strokeLinecap:'round'},h('path',{d:'M5 12.55a11 11 0 0114.08 0M1.42 9a16 16 0 0121.16 0M8.53 16.11a6 6 0 016.95 0M12 20h.01'}));
+const IconTV = () => h('svg',{width:20,height:20,viewBox:'0 0 24 24',fill:'none',stroke:'currentColor',strokeWidth:1.8,strokeLinecap:'round'},h('rect',{x:2,y:3,width:20,height:14,rx:2}),h('path',{d:'M8 21h8M12 17v4'}));
+const IconAC = () => h('svg',{width:20,height:20,viewBox:'0 0 24 24',fill:'none',stroke:'currentColor',strokeWidth:1.8,strokeLinecap:'round'},h('rect',{x:2,y:6,width:20,height:8,rx:2}),h('path',{d:'M6 18l2-4M12 18v-4M18 18l-2-4'}));
+const IconKitchen = () => h('svg',{width:20,height:20,viewBox:'0 0 24 24',fill:'none',stroke:'currentColor',strokeWidth:1.8,strokeLinecap:'round'},h('path',{d:'M8 2v4M12 2v4M16 2v4M3 8h18v13a1 1 0 01-1 1H4a1 1 0 01-1-1V8zM3 8l3-6M21 8l-3-6'}));
+const IconParking = () => h('svg',{width:20,height:20,viewBox:'0 0 24 24',fill:'none',stroke:'currentColor',strokeWidth:1.8,strokeLinecap:'round'},h('rect',{x:3,y:3,width:18,height:18,rx:2}),h('path',{d:'M9 17V7h4a3 3 0 010 6H9'}));
+const IconPool = () => h('svg',{width:20,height:20,viewBox:'0 0 24 24',fill:'none',stroke:'currentColor',strokeWidth:1.8,strokeLinecap:'round'},h('path',{d:'M2 12h20M2 18c2.5-3 5-3 7.5 0s5 3 7.5 0M7 12V8a5 5 0 0110 0v4'}));
+const IconSecurity = () => h('svg',{width:20,height:20,viewBox:'0 0 24 24',fill:'none',stroke:'currentColor',strokeWidth:1.8,strokeLinecap:'round'},h('path',{d:'M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z'}));
+const IconUSB = () => h('svg',{width:20,height:20,viewBox:'0 0 24 24',fill:'none',stroke:'currentColor',strokeWidth:1.8,strokeLinecap:'round'},h('path',{d:'M12 2v8M8 6l4-4 4 4M5 10h14v4a7 7 0 01-14 0v-4z'}));
+const IconWA = () => h('svg',{xmlns:'http://www.w3.org/2000/svg',viewBox:'0 0 24 24',width:22,height:22,fill:'currentColor'},
+  h('path',{d:'M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347zM12 0C5.373 0 0 5.373 0 12c0 2.124.558 4.12 1.535 5.845L.057 23.885l6.2-1.627A11.932 11.932 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.808 9.808 0 01-5.031-1.388l-.36-.214-3.733.979.995-3.64-.233-.374A9.774 9.774 0 012.182 12c0-5.418 4.4-9.818 9.818-9.818S21.818 6.582 21.818 12 17.418 21.818 12 21.818z'})
+);
+
+const amenityIconMap = {
+  'High-Speed WiFi': IconWifi,
+  'DSTV & Netflix': IconTV,
+  'Air Conditioning': IconAC,
+  'Full Kitchen': IconKitchen,
+  'Secure Parking': IconParking,
+  'Swimming Pool Access': IconPool,
+  'Private Pool': IconPool,
+  '24/7 Security': IconSecurity,
+  'USB Charging Ports': IconUSB,
+};
+const getAmenityIcon = (name) => {
+  for (const key of Object.keys(amenityIconMap)) {
+    if (name.includes(key.split(' ')[0])) return amenityIconMap[key];
+  }
+  return () => h('svg',{width:20,height:20,viewBox:'0 0 24 24',fill:'none',stroke:'currentColor',strokeWidth:1.8,strokeLinecap:'round'},h('circle',{cx:12,cy:12,r:10}),h('path',{d:'M12 8v4M12 16h.01'}));
+};
+
+/* ────────────────────────────────────────────
+   NAV
+──────────────────────────────────────────── */
+function Nav({ onLogoClick }) {
+  return h('nav', { className: 'nav' },
+    h('div', { className: 'nav-logo', onClick: onLogoClick },
+      'Kahawa', h('span', null, ' Homes')
+    ),
+    h('div', { className: 'nav-search' },
+      h('div', { className: 'nav-search-pill' }, 'Anywhere'),
+      h('div', { className: 'nav-search-pill' }, 'Anytime'),
+      h('div', { className: 'nav-search-pill' }, 'Add guests'),
+      h('button', { className: 'nav-search-btn', 'aria-label': 'Search' }, h(IconSearch))
+    ),
+    h('div', { className: 'nav-right' },
+      h('button', { className: 'nav-link' }, 'Become a host'),
+      h('button', { className: 'nav-avatar', 'aria-label': 'Menu' }, h(IconUser))
+    )
+  );
+}
+
+/* ────────────────────────────────────────────
+   FILTER BAR
+──────────────────────────────────────────── */
+const filters = ['All','Apartments','Villas','Cottages','Lofts','Studios','Beachfront'];
+function FilterBar({ active, onChange }) {
+  return h('div', { className: 'filter-bar' },
+    filters.map(f => h('button', { key: f, className: `chip${active === f ? ' active' : ''}`, onClick: () => onChange(f) }, f))
+  );
+}
+
+/* ────────────────────────────────────────────
+   PROPERTY CARD
+──────────────────────────────────────────── */
+function PropertyCard({ prop, onClick }) {
+  const [saved, setSaved] = useState(false);
+  return h('div', { className: 'prop-card', onClick },
+    h('div', { className: 'card-img' },
+      h('img', { src: prop.images[0], alt: prop.name, loading: 'lazy' }),
+      h('div', { className: 'card-badge' }, prop.badge),
+      h('button', {
+        className: 'card-heart',
+        onClick: e => { e.stopPropagation(); setSaved(!saved); },
+        'aria-label': saved ? 'Unsave' : 'Save',
+      }, saved ? '❤️' : '🤍')
+    ),
+    h('div', { className: 'card-body' },
+      h('div', { className: 'card-top' },
+        h('span', { className: 'card-name' }, prop.name),
+        h('span', { className: 'card-rating' }, h(IconStar), prop.rating)
+      ),
+      h('p', { className: 'card-location' }, prop.location),
+      h('p', { className: 'card-price' },
+        h('strong', null, `KSh ${prop.pricePerNight.toLocaleString()}`),
+        h('span', null, ' / night')
+      )
+    )
+  );
+}
+
+/* ────────────────────────────────────────────
+   HOME VIEW
+──────────────────────────────────────────── */
+function HomeView({ onSelect }) {
+  const [filter, setFilter] = useState('All');
+  const filtered = filter === 'All' ? properties : properties;
+  return h('div', { className: 'home-wrap fade-in' },
+    h('div', { className: 'section-heading' },
+      `Popular homes in Mombasa →`
+    ),
+    h('div', { className: 'prop-grid' },
+      filtered.map(p => h(PropertyCard, { key: p.id, prop: p, onClick: () => onSelect(p) }))
+    )
+  );
+}
+
+/* ────────────────────────────────────────────
+   DETAIL VIEW
+──────────────────────────────────────────── */
+function DetailView({ prop, onBack }) {
+  const [checkIn, setCheckIn]   = useState('');
+  const [checkOut, setCheckOut] = useState('');
+  const [guests, setGuests]     = useState(1);
+  const [name, setName]         = useState('');
+
+  // Calculate nights + total
+  const nights = checkIn && checkOut
+    ? Math.max(0, Math.round((new Date(checkOut) - new Date(checkIn)) / 86400000))
+    : 0;
+  const total = nights * prop.pricePerNight;
+
+  const handleBook = () => {
+    if (!name || !checkIn || !checkOut) { alert('Please fill in your name and dates.'); return; }
+    const msg = `Hello! I would like to book *${prop.name}* in *${prop.location}* from *${checkIn}* to *${checkOut}* for *${guests} guest(s)*. My name is *${name}*. Please confirm availability. Thank you! 🙏`;
+    window.open(`https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(msg)}`, '_blank');
+  };
+
+  return h('div', { className: 'detail-wrap fade-in' },
+    // Back
+    h('button', { className: 'detail-back', onClick: onBack }, h(IconBack), ' Back to listings'),
+
+    // Header
+    h('div', { className: 'detail-header' },
+      h('h1', { className: 'detail-title' }, prop.name),
+      h('div', { className: 'detail-actions' },
+        h('button', { className: 'detail-action-btn' }, h(IconShare), ' Share'),
+        h('button', { className: 'detail-action-btn' }, h(IconHeart), ' Save')
+      )
+    ),
+
+    // Mosaic
+    h('div', { className: 'mosaic' },
+      h('div', { className: 'mosaic-main' },
+        h('img', { src: prop.images[0], alt: prop.name })
+      ),
+      h('div', { className: 'mosaic-side' },
+        h('img', { src: prop.images[1], alt: '' }),
+        h('div', { className: 'mosaic-more-wrap' },
+          h('img', { src: prop.images[2], alt: '' }),
+          h('button', { className: 'mosaic-more-btn' }, h(IconGrid), ` Show all photos`)
+        )
+      )
+    ),
+
+    // Body
+    h('div', { className: 'detail-body' },
+
+      // ── LEFT ──
+      h('div', null,
+        h('p', { style: { fontWeight: 600, fontSize: '1.05rem', marginBottom: '.3rem' } }, prop.type, ' · ', prop.location),
+        h('p', { className: 'detail-meta' },
+          `${prop.guests} guests · ${prop.bedrooms} bedroom${prop.bedrooms>1?'s':''} · ${prop.beds} bed${prop.beds>1?'s':''} · ${prop.baths} bath${prop.baths>1?'s':''}`
+        ),
+
+        // Rating badge
+        h('div', { className: 'detail-badges' },
+          h('div', { className: 'detail-badge' },
+            h('div', { className: 'detail-badge-icon' }, '🏅'),
+            h('div', { className: 'detail-badge-text' },
+              h('strong', null, 'Guest Favourite'),
+              h('span', null, 'One of the most loved homes')
+            )
+          ),
+          h('div', { className: 'detail-badge' },
+            h('div', { className: 'detail-badge-icon' }, '⭐'),
+            h('div', { className: 'detail-badge-text' },
+              h('strong', null, prop.rating),
+              h('span', null, `${prop.reviews} reviews`)
+            )
+          )
+        ),
+
+        h('hr', { className: 'divider' }),
+
+        // Host
+        h('div', { className: 'host-row' },
+          h('div', { className: 'host-avatar' }, prop.host.name[0]),
+          h('div', { className: 'host-info' },
+            h('strong', null, `Hosted by ${prop.host.name}`),
+            h('span', null, `${prop.host.months} months hosting`)
+          )
+        ),
+
+        h('hr', { className: 'divider' }),
+
+        // Description
+        h('p', { className: 'detail-desc' },
+          ...prop.description.split('\n').flatMap((line, i, arr) =>
+            i < arr.length - 1 ? [line, h('br', { key: i }), h('br', { key: `s${i}` })] : [line]
+          )
+        ),
+
+        h('hr', { className: 'divider' }),
+
+        // Amenities
+        h('h3', { style: { fontFamily: 'var(--serif)', fontSize: '1.25rem', marginBottom: '1rem' } }, 'What this place offers'),
+        h('div', { className: 'amenities-grid-detail' },
+          prop.amenities.map((a, i) => {
+            const Icon = getAmenityIcon(a);
+            return h('div', { key: i, className: 'amenity-row' }, h(Icon), a);
+          })
+        ),
+
+        h('hr', { className: 'divider' }),
+
+        // Rules
+        h('h3', { style: { fontFamily: 'var(--serif)', fontSize: '1.25rem', marginBottom: '.5rem' } }, 'House rules'),
+        h('ul', { className: 'rules-list' },
+          prop.rules.map((r, i) => h('li', { key: i },
+            h('span', { style: { fontSize: '1rem' } }, '✓'), r
+          ))
+        )
+      ),
+
+      // ── RIGHT (sticky booking card) ──
+      h('div', { className: 'booking-sticky' },
+        h('div', { className: 'booking-card' },
+          h('p', { className: 'booking-price' },
+            `KSh ${prop.pricePerNight.toLocaleString()}`, h('span', null, ' / night')
+          ),
+
+          // Name
+          h('label', { style: { fontSize: '.72rem', fontWeight: 700, letterSpacing: '.08em', textTransform: 'uppercase', display: 'block', marginBottom: '.4rem' } }, 'Your Name'),
+          h('input', {
+            type: 'text', className: 'name-field',
+            placeholder: 'e.g. Nelly Arunga',
+            value: name, onChange: e => setName(e.target.value)
+          }),
+
+          // Dates
+          h('div', { style: { fontSize: '.72rem', fontWeight: 700, letterSpacing: '.08em', textTransform: 'uppercase', marginBottom: '.4rem' } }, 'Dates'),
+          h('div', { className: 'date-row' },
+            h('div', { style: { borderRight: '1px solid var(--border)', padding: 0 } },
+              h('label', { className: 'date-label', style: { padding: '.7rem .9rem .1rem' } }, 'Check-in'),
+              h('input', { className: 'date-field', type: 'date', value: checkIn, onChange: e => setCheckIn(e.target.value), style: { display: 'block' } })
+            ),
+            h('div', null,
+              h('label', { className: 'date-label', style: { padding: '.7rem .9rem .1rem' } }, 'Check-out'),
+              h('input', { className: 'date-field', type: 'date', value: checkOut, onChange: e => setCheckOut(e.target.value), style: { display: 'block' } })
+            )
+          ),
+
+          // Guests
+          h('label', { style: { fontSize: '.72rem', fontWeight: 700, letterSpacing: '.08em', textTransform: 'uppercase', display: 'block', margin: '.8rem 0 .4rem' } }, 'Guests'),
+          h('select', { className: 'guests-field', value: guests, onChange: e => setGuests(Number(e.target.value)) },
+            [...Array(prop.guests)].map((_, i) => h('option', { key: i+1, value: i+1 }, `${i+1} guest${i+1 > 1 ? 's' : ''}`))
+          ),
+
+          // WhatsApp button
+          h('button', { className: 'wa-btn', onClick: handleBook },
+            h(IconWA), 'Reserve via WhatsApp'
+          ),
+          h('p', { className: 'booking-note' }, 'You won\'t be charged yet — we\'ll confirm via WhatsApp first.'),
+
+          // Price breakdown
+          nights > 0 && h('div', { className: 'booking-breakdown' },
+            h('div', { className: 'booking-breakdown-row' },
+              h('span', null, `KSh ${prop.pricePerNight.toLocaleString()} × ${nights} night${nights > 1 ? 's' : ''}`),
+              h('span', null, `KSh ${total.toLocaleString()}`)
+            ),
+            h('div', { className: 'booking-breakdown-row' },
+              h('span', null, 'Service fee'),
+              h('span', null, 'KSh 0')
+            ),
+            h('div', { className: 'booking-breakdown-row total' },
+              h('span', null, 'Total'),
+              h('span', null, `KSh ${total.toLocaleString()}`)
+            )
+          )
+        )
+      )
+    )
+  );
+}
+
+/* ────────────────────────────────────────────
+   FOOTER
+──────────────────────────────────────────── */
+function Footer() {
+  const waPath = 'M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347zM12 0C5.373 0 0 5.373 0 12c0 2.124.558 4.12 1.535 5.845L.057 23.885l6.2-1.627A11.932 11.932 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.808 9.808 0 01-5.031-1.388l-.36-.214-3.733.979.995-3.64-.233-.374A9.774 9.774 0 012.182 12c0-5.418 4.4-9.818 9.818-9.818S21.818 6.582 21.818 12 17.418 21.818 12 21.818z';
+  const igPath  = 'M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z';
+  const fbPath  = 'M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z';
+
+  return h('footer', null,
+    h('div', { className: 'footer-logo' }, 'Kahawa', h('span', null, ' Homes')),
+    h('p', { className: 'footer-sub' }, 'Boutique Bed & Breakfast · Kenya'),
+    h('div', { className: 'footer-links' },
+      h('a', { href: `https://wa.me/${WA_NUMBER}`, target: '_blank' }, '📱 +254 712 345 678'),
+      h('a', { href: 'mailto:hello@kahahwahomes.co.ke' }, '✉️ hello@kahahwahomes.co.ke'),
+    ),
+    h('div', { className: 'footer-socials' },
+      h('a', { href: `https://wa.me/${WA_NUMBER}`, target: '_blank', title: 'WhatsApp' }, h('svg',{viewBox:'0 0 24 24'},h('path',{d:waPath}))),
+      h('a', { href: '#', title: 'Instagram' }, h('svg',{viewBox:'0 0 24 24'},h('path',{d:igPath}))),
+      h('a', { href: '#', title: 'Facebook' }, h('svg',{viewBox:'0 0 24 24'},h('path',{d:fbPath})))
+    ),
+    h('p', { className: 'footer-copy' }, `© ${new Date().getFullYear()} Kahawa Homes. All rights reserved.`)
+  );
+}
+
+/* ────────────────────────────────────────────
+   APP (router)
+──────────────────────────────────────────── */
+function App() {
+  const [selected, setSelected] = useState(null);
+  const [filter, setFilter]     = useState('All');
+
+  const goHome = () => { setSelected(null); window.scrollTo(0,0); };
+  const goDetail = (p) => { setSelected(p); window.scrollTo(0,0); };
+
+  return h(React.Fragment, null,
+    h(Nav, { onLogoClick: goHome }),
+    !selected && h(FilterBar, { active: filter, onChange: setFilter }),
+    selected
+      ? h(DetailView, { prop: selected, onBack: goHome })
+      : h(HomeView, { onSelect: goDetail }),
+    h(Footer, null)
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(h(App, null));
+</script>
+</body>
+</html>
