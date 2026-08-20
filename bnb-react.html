@@ -1283,8 +1283,10 @@ function App() {
       return response.json();
     });
 
-    loadProperties('properties.json')
-      .catch(() => loadProperties('https://raw.githubusercontent.com/stacy-ao/kahawa-homes/main/properties.json'))
+    const localDataUrl = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+      ? 'properties.json'
+      : 'https://raw.githubusercontent.com/stacy-ao/kahawa-homes/main/properties.json';
+    loadProperties(localDataUrl)
       .then(response => {
         const data = response;
         const loadedProperties = Array.isArray(data) ? data : data.properties;
