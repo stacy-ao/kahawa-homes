@@ -192,7 +192,6 @@
       box-shadow: var(--shadow-xs);
       display: flex; align-items: center; gap: .3rem;
     }
-    .card-badge::before { content: '🏡'; font-size: .7rem; }
     .card-heart {
       position: absolute; top: .7rem; right: .7rem;
       width: 32px; height: 32px; border-radius: 50%;
@@ -709,7 +708,7 @@ function PropertyCard({ prop, onClick }) {
         className: 'card-heart',
         onClick: e => { e.stopPropagation(); setSaved(!saved); },
         'aria-label': saved ? 'Unsave' : 'Save',
-      }, saved ? '❤️' : '🤍')
+      }, saved ? h(IconHeart) : h(IconHeart))
     ),
     h('div', { className: 'card-body' },
       h('div', { className: 'card-top' },
@@ -775,7 +774,7 @@ function DetailView({ prop, onBack }) {
 
   const handleBook = () => {
     if (!name || !checkIn || !checkOut) { alert('Please fill in your name and dates.'); return; }
-    const msg = `Hello! I would like to book *${prop.name}* in *${prop.location}* from *${checkIn}* to *${checkOut}* for *${guests} guest(s)*. My name is *${name}*. Please confirm availability. Thank you! 🙏`;
+    const msg = `Hello! I would like to book *${prop.name}* in *${prop.location}* from *${checkIn}* to *${checkOut}* for *${guests} guest(s)*. My name is *${name}*. Please confirm availability. Thank you!`;
     window.open(`https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(msg)}`, '_blank');
   };
 
@@ -819,14 +818,14 @@ function DetailView({ prop, onBack }) {
         // Rating badge
         h('div', { className: 'detail-badges' },
           h('div', { className: 'detail-badge' },
-            h('div', { className: 'detail-badge-icon' }, '🏅'),
+            h('div', { className: 'detail-badge-icon' }),
             h('div', { className: 'detail-badge-text' },
               h('strong', null, 'Guest Favourite'),
               h('span', null, 'One of the most loved homes')
             )
           ),
           h('div', { className: 'detail-badge' },
-            h('div', { className: 'detail-badge-icon' }, '⭐'),
+            h('div', { className: 'detail-badge-icon' }, h(IconStar)),
             h('div', { className: 'detail-badge-text' },
               h('strong', null, prop.rating),
               h('span', null, `${prop.reviews} reviews`)
@@ -870,9 +869,7 @@ function DetailView({ prop, onBack }) {
         // Rules
         h('h3', { style: { fontFamily: 'var(--serif)', fontSize: '1.25rem', marginBottom: '.5rem' } }, 'House rules'),
         h('ul', { className: 'rules-list' },
-          prop.rules.map((r, i) => h('li', { key: i },
-            h('span', { style: { fontSize: '1rem' } }, '✓'), r
-          ))
+          prop.rules.map((r, i) => h('li', { key: i }, r))
         )
       ),
 
