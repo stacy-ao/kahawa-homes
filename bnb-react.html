@@ -202,6 +202,7 @@
       box-shadow: var(--shadow-xs);
     }
     .card-heart:hover { transform: scale(1.15); background: white; }
+    .card-heart.saved { background: var(--gold-lt); color: var(--espresso); }
     .card-body { padding: .85rem .1rem .4rem; }
     .card-top { display: flex; justify-content: space-between; align-items: flex-start; gap: .5rem; }
     .card-name { font-weight: 600; font-size: .95rem; color: var(--espresso); }
@@ -326,6 +327,7 @@
     .landing-photo.three { width: 39%; height: 62%; right: 0; bottom: 0; border-radius: 48% 10% 48% 48%; transform: rotate(8deg); }
     .landing-title { max-width: 650px; font-family: var(--serif); font-size: clamp(2.2rem, 6vw, 4.8rem); line-height: .98; letter-spacing: 0; }
     .landing-subtitle { color: var(--muted); font-size: 1rem; }
+    .landing-name { width: min(100%, 280px); padding: .8rem 1rem; border: 1px solid var(--border); border-radius: 9999px; background: var(--white); text-align: center; font: inherit; }
     .landing-cta { background: var(--espresso); color: white; border: none; border-radius: 9999px; padding: .95rem 1.8rem; font: inherit; font-weight: 700; cursor: pointer; }
     .landing-cta:hover { background: var(--espresso-mid); transform: translateY(-1px); }
     .browse-header { display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin-bottom: 1.25rem; }
@@ -356,6 +358,8 @@
     .detail-bottom-bar { position: fixed; z-index: 12; left: 50%; bottom: 1rem; transform: translateX(-50%); width: min(92vw, 720px); display: flex; align-items: center; justify-content: space-between; gap: 1rem; background: var(--white); border: 1px solid var(--border); border-radius: 9999px; padding: .65rem .7rem .65rem 1.2rem; box-shadow: var(--shadow-md); }
     .detail-bottom-bar strong, .detail-bottom-bar small { display: block; }
     .detail-bottom-bar small { color: var(--muted); font-size: .72rem; }
+    .booking-reminder { position: fixed; right: 1rem; bottom: 1rem; z-index: 40; width: min(90vw, 360px); background: var(--white); border: 1px solid var(--border); border-radius: 1rem; padding: 1rem; box-shadow: var(--shadow-lg); }
+    .booking-reminder strong { display: block; margin-bottom: .25rem; }
 
     /* ── Detail Body ── */
     .detail-body {
@@ -760,7 +764,7 @@ function FilterBar({ active, onChange, properties }) {
   );
 }
 
-function LandingView({ onExplore, properties }) {
+function LandingView({ onExplore, properties, userName, onNameChange }) {
   const photos = (properties.length ? properties : fallbackProperties).flatMap(property => property.images).slice(0, 3);
   return h('main', { className: 'landing-screen' },
     h('div', { className: 'landing-brand' }, 'Kahawa', h('span', null, ' Homes')),
@@ -770,6 +774,7 @@ function LandingView({ onExplore, properties }) {
       ),
       h('p', { className: 'landing-subtitle' }, 'No stress, just relax'),
       h('h1', { className: 'landing-title' }, 'Find the perfect place to relax for a couple of taps'),
+      h('input', { className: 'landing-name', value: userName, onChange: event => onNameChange(event.target.value), placeholder: 'What should we call you?', 'aria-label': 'Your name' }),
       h('button', { className: 'landing-cta', onClick: onExplore }, 'Let\'s Escape')
     )
   );
@@ -813,17 +818,16 @@ function FilterModal({ onClose, priceMax, onPriceChange, type, onTypeChange, fil
 /* ────────────────────────────────────────────
    PROPERTY CARD
 ──────────────────────────────────────────── */
-function PropertyCard({ prop, onClick }) {
-  const [saved, setSaved] = useState(false);
+function PropertyCard({ prop, onClick, saved, onToggleFavorite }) {
   return h('div', { className: 'prop-card', onClick },
     h('div', { className: 'card-img' },
       h('img', { src: prop.images[0], alt: prop.name, loading: 'lazy' }),
       h('div', { className: 'card-badge' }, prop.badge),
       h('button', {
-        className: 'card-heart',
-        onClick: e => { e.stopPropagation(); setSaved(!saved); },
+        className: `card-heart${saved ? ' saved' : ''}`,
+        onClick: e => { e.stopPropagation(); onToggleFavorite(prop.id); },
         'aria-label': saved ? 'Unsave' : 'Save',
-      }, saved ? h(IconHeart) : h(IconHeart))
+      }, h(IconHeart))
     ),
     h('div', { className: 'card-body' },
       h('div', { className: 'card-top' },
@@ -845,7 +849,7 @@ function PropertyCard({ prop, onClick }) {
 /* ────────────────────────────────────────────
    HOME VIEW
 ──────────────────────────────────────────── */
-function HomeView({ onSelect, search, filter, properties, onOpenFilters, type, priceMax, ratingMin, reviewsMin, onNavChange }) {
+function HomeView({ onSelect, search, filter, properties, onOpenFilters, type, priceMax, ratingMin, reviewsMin, onNavChange, browseNav, favorites, favoriteOnly, userName, onNotifications, onToggleFavorite }) {
   const searchTerm = search.trim().toLowerCase();
   const filtered = properties.filter(prop => {
     const matchesLocation = filter === 'All locations' || prop.location.startsWith(`${filter},`) || prop.location === filter;
@@ -853,14 +857,15 @@ function HomeView({ onSelect, search, filter, properties, onOpenFilters, type, p
     const matchesType = type === 'All types' || prop.type.toLowerCase().includes(type.toLowerCase());
     const matchesRating = prop.rating >= ratingMin;
     const matchesReviews = prop.reviews >= reviewsMin;
+    const matchesFavorite = !favoriteOnly || favorites.includes(prop.id);
     const matchesSearch = !searchTerm || [prop.name, prop.location, prop.description]
       .some(value => value.toLowerCase().includes(searchTerm));
-    return matchesLocation && matchesPrice && matchesType && matchesRating && matchesReviews && matchesSearch;
+    return matchesLocation && matchesPrice && matchesType && matchesRating && matchesReviews && matchesSearch && matchesFavorite;
   });
   return h('div', { className: 'home-wrap fade-in' },
     h('div', { className: 'browse-header' },
-      h('div', null, h('div', { className: 'browse-greeting' }, 'Hey, Nelly'), h('p', { className: 'card-location' }, 'Find a place to slow down')),
-      h('button', { className: 'icon-circle', 'aria-label': 'Notifications' }, h(IconBell))
+      h('div', null, h('div', { className: 'browse-greeting' }, `Hey, ${userName || 'there'}`), h('p', { className: 'card-location' }, 'Find a place to slow down')),
+      h('button', { className: 'icon-circle', onClick: onNotifications, 'aria-label': 'Notifications' }, h(IconBell))
     ),
     h('div', { className: 'browse-tools' },
       h('button', { className: 'browse-filter', onClick: onOpenFilters }, filter === 'All locations' ? 'Location' : filter, h(IconChevron)),
@@ -872,9 +877,18 @@ function HomeView({ onSelect, search, filter, properties, onOpenFilters, type, p
       `${searchTerm ? `Search results for "${search.trim()}"` : filter === 'All locations' ? 'Popular homes' : `Homes in ${filter}`} →`
     ),
     h('div', { className: 'prop-grid browse-grid' },
-      filtered.map(p => h(PropertyCard, { key: p.id, prop: p, onClick: () => onSelect(p) }))
+      filtered.map(p => h(PropertyCard, { key: p.id, prop: p, onClick: () => onSelect(p), saved: favorites.includes(p.id), onToggleFavorite }))
     ),
-    h(BrowseNav, { active: 0, onChange: onNavChange })
+    h(BrowseNav, { active: browseNav, onChange: onNavChange })
+  );
+}
+
+function BookingReminder({ booking, onClose }) {
+  if (!booking) return null;
+  return h('div', { className: 'booking-reminder', role: 'status' },
+    h('strong', null, 'Booking reminder'),
+    h('p', null, `${booking.property} is booked for ${booking.checkIn}.`),
+    h('button', { className: 'landing-cta', style: { marginTop: '.7rem', padding: '.55rem 1rem' }, onClick: onClose }, 'Dismiss')
   );
 }
 
@@ -888,7 +902,7 @@ function DetailBottomBar({ prop, onBook }) {
 /* ────────────────────────────────────────────
    DETAIL VIEW
 ──────────────────────────────────────────── */
-function DetailView({ prop, onBack }) {
+function DetailView({ prop, onBack, userName, onBooking, onBook }) {
   const [checkIn, setCheckIn]   = useState('');
   const [checkOut, setCheckOut] = useState('');
   const [guests, setGuests]     = useState(1);
@@ -914,6 +928,7 @@ function DetailView({ prop, onBack }) {
 
   const handleBook = () => {
     if (!name || !checkIn || !checkOut) { alert('Please fill in your name and dates.'); return; }
+    onBooking({ property: prop.name, location: prop.location, checkIn, checkOut, name, createdAt: Date.now() });
     const msg = `Hello! I would like to book *${prop.name}* in *${prop.location}* from *${checkIn}* to *${checkOut}* for *${guests} guest(s)*. My name is *${name}*. Please confirm availability. Thank you!`;
     window.open(`https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(msg)}`, '_blank');
   };
@@ -938,7 +953,6 @@ function DetailView({ prop, onBack }) {
     ),
 
     h('div', { className: 'detail-specs' },
-      h('span', { className: 'detail-spec' }, '150 m²'),
       h('span', { className: 'detail-spec' }, `${prop.guests} guests`),
       h('span', { className: 'detail-spec' }, `${prop.baths} bath`),
       h('span', { className: 'detail-spec' }, `${prop.beds} beds`)
@@ -1035,7 +1049,7 @@ function DetailView({ prop, onBack }) {
 
       // ── RIGHT (sticky booking card) ──
       h('div', { className: 'booking-sticky' },
-        h('div', { className: 'booking-card' },
+        h('div', { className: 'booking-card', id: 'reserve-form' },
           h('p', { className: 'booking-price' },
             `KSh ${prop.pricePerNight.toLocaleString()}`, h('span', null, ' / night')
           ),
@@ -1045,7 +1059,7 @@ function DetailView({ prop, onBack }) {
           h('input', {
             type: 'text', className: 'name-field',
             placeholder: 'e.g. Nelly Arunga',
-            value: name, onChange: e => setName(e.target.value)
+            value: name || userName, onChange: e => setName(e.target.value)
           }),
 
           // Dates
@@ -1091,7 +1105,7 @@ function DetailView({ prop, onBack }) {
         )
       )
     ),
-    h(DetailBottomBar, { prop, onBook: handleBook }),
+    h(DetailBottomBar, { prop, onBook }),
     activeImage !== null && h('div', { className: 'photo-modal', role: 'dialog', 'aria-modal': 'true', 'aria-label': `${prop.name} photo gallery`, onClick: () => setActiveImage(null) },
       h('button', { className: 'photo-modal-close', onClick: () => setActiveImage(null), 'aria-label': 'Close photos', title: 'Close photos' }, h(IconClose)),
       prop.images.length > 1 && h('button', { className: 'photo-modal-nav photo-modal-prev', onClick: event => { event.stopPropagation(); setActiveImage(index => (index - 1 + prop.images.length) % prop.images.length); }, 'aria-label': 'Previous photo' }, '‹'),
@@ -1155,6 +1169,7 @@ function normalizeProperty(property, index) {
 
 function App() {
   const [currentScreen, setCurrentScreen] = useState('landing');
+  const [userName, setUserName] = useState(() => localStorage.getItem('kahawa-user-name') || '');
   const [selected, setSelected] = useState(null);
   const [search, setSearch]     = useState('');
   const [filter, setFilter]     = useState('All locations');
@@ -1164,6 +1179,10 @@ function App() {
   const [reviewsMin, setReviewsMin] = useState(0);
   const [filterOpen, setFilterOpen] = useState(false);
   const [browseNav, setBrowseNav] = useState(0);
+  const [favorites, setFavorites] = useState(() => JSON.parse(localStorage.getItem('kahawa-favorites') || '[]'));
+  const [favoriteOnly, setFavoriteOnly] = useState(false);
+  const [booking, setBooking] = useState(() => JSON.parse(localStorage.getItem('kahawa-booking') || 'null'));
+  const [notificationOpen, setNotificationOpen] = useState(false);
   const [properties, setProperties] = useState([]);
   const [propertiesLoading, setPropertiesLoading] = useState(true);
   const [propertiesError, setPropertiesError] = useState('');
@@ -1194,19 +1213,53 @@ function App() {
   const goHome = () => { setSelected(null); setCurrentScreen('browse'); window.scrollTo(0,0); };
   const goDetail = (p) => { setSelected(p); setCurrentScreen('detail'); window.scrollTo(0,0); };
   const locations = ['All locations', ...new Set(properties.map(prop => prop.location.split(',')[0].trim()))];
+  const saveUserName = name => { setUserName(name); localStorage.setItem('kahawa-user-name', name); };
+  const toggleFavorite = id => setFavorites(current => {
+    const next = current.includes(id) ? current.filter(item => item !== id) : [...current, id];
+    localStorage.setItem('kahawa-favorites', JSON.stringify(next));
+    return next;
+  });
+  const handleBooking = nextBooking => {
+    setBooking(nextBooking);
+    localStorage.setItem('kahawa-booking', JSON.stringify(nextBooking));
+    setNotificationOpen(true);
+    if ('Notification' in window && Notification.permission === 'granted') new Notification('Kahawa Homes booking saved', { body: `${nextBooking.property} is booked for ${nextBooking.checkIn}.` });
+  };
+  const handleBrowseNav = index => {
+    setBrowseNav(index);
+    if (index === 0) { setFavoriteOnly(false); goHome(); }
+    if (index === 1) { setFavoriteOnly(true); setCurrentScreen('browse'); setSelected(null); }
+    if (index === 2) setNotificationOpen(true);
+    if (index === 3) { const name = window.prompt('What should we call you?', userName); if (name !== null) saveUserName(name.trim()); }
+    if (index === 4 && navigator.share) navigator.share({ title: 'Kahawa Homes', url: window.location.href });
+  };
+  const enableNotifications = () => { if ('Notification' in window && Notification.permission === 'default') Notification.requestPermission(); setNotificationOpen(true); };
+  const scrollToReserve = () => document.getElementById('reserve-form')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+  useEffect(() => {
+    if (!booking?.checkIn) return undefined;
+    const reminderTime = new Date(`${booking.checkIn}T09:00:00`).getTime() - 86400000;
+    const delay = Math.max(0, reminderTime - Date.now());
+    const timer = setTimeout(() => {
+      setNotificationOpen(true);
+      if ('Notification' in window && Notification.permission === 'granted') new Notification('Kahawa Homes reminder', { body: `${booking.property} is almost here, on ${booking.checkIn}.` });
+    }, delay);
+    return () => clearTimeout(timer);
+  }, [booking]);
 
   return h(React.Fragment, null,
     currentScreen === 'landing'
-      ? h(LandingView, { onExplore: () => setCurrentScreen('browse'), properties })
+      ? h(LandingView, { onExplore: () => setCurrentScreen('browse'), properties, userName, onNameChange: saveUserName })
       : h(React.Fragment, null,
         h(Nav, { onLogoClick: goHome, search, onSearch: setSearch }),
         propertiesError && h('p', { className: 'load-error', role: 'alert' }, propertiesError),
         propertiesLoading && h('p', { className: 'load-error' }, 'Loading current properties...'),
         currentScreen === 'detail' && selected
-          ? h(DetailView, { prop: selected, onBack: goHome })
-          : !propertiesLoading && h(HomeView, { onSelect: goDetail, search, filter, properties, onOpenFilters: () => setFilterOpen(true), type, priceMax, ratingMin, reviewsMin, onNavChange: setBrowseNav }),
+          ? h(DetailView, { prop: selected, userName, onBack: goHome, onBooking: handleBooking, onBook: scrollToReserve })
+          : !propertiesLoading && h(HomeView, { onSelect: goDetail, search, filter, properties, onOpenFilters: () => setFilterOpen(true), type, priceMax, ratingMin, reviewsMin, onNavChange: handleBrowseNav, browseNav, favorites, favoriteOnly, userName, onNotifications: enableNotifications, onToggleFavorite: toggleFavorite }),
         currentScreen !== 'detail' && h(Footer, null),
-        filterOpen && h(FilterModal, { onClose: () => setFilterOpen(false), priceMax, onPriceChange: setPriceMax, type, onTypeChange: setType, filter, locations, onLocationChange: setFilter, ratingMin, onRatingChange: setRatingMin, reviewsMin, onReviewsChange: setReviewsMin })
+        filterOpen && h(FilterModal, { onClose: () => setFilterOpen(false), priceMax, onPriceChange: setPriceMax, type, onTypeChange: setType, filter, locations, onLocationChange: setFilter, ratingMin, onRatingChange: setRatingMin, reviewsMin, onReviewsChange: setReviewsMin }),
+        h(BookingReminder, { booking: notificationOpen ? booking : null, onClose: () => setNotificationOpen(false) })
       )
   );
 }
