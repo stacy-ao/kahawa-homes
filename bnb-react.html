@@ -934,11 +934,12 @@ function App() {
   const [selected, setSelected] = useState(null);
   const [search, setSearch]     = useState('');
   const [filter, setFilter]     = useState('All locations');
-  const [properties, setProperties] = useState(fallbackProperties);
+  const [properties, setProperties] = useState([]);
+  const [propertiesLoading, setPropertiesLoading] = useState(true);
   const [propertiesError, setPropertiesError] = useState('');
 
   useEffect(() => {
-    const dataVersion = 'b7c6a69';
+    const dataVersion = Date.now();
     const loadProperties = (url) => fetch(`${url}?v=${dataVersion}`, { cache: 'no-store' }).then(response => {
       if (!response.ok) throw new Error(`Could not load ${url} (${response.status})`);
       return response.json();
@@ -951,10 +952,12 @@ function App() {
         const loadedProperties = Array.isArray(data) ? data : data.properties;
         if (!Array.isArray(loadedProperties)) throw new Error('properties.json must contain an array of properties');
         setProperties(loadedProperties.map(normalizeProperty));
+        setPropertiesLoading(false);
       })
       .catch(error => {
         console.error(error);
-        setPropertiesError('Property data could not be loaded. Showing the default listings.');
+        setPropertiesLoading(false);
+        setPropertiesError('Property data could not be loaded.');
       });
   }, []);
 
@@ -964,10 +967,11 @@ function App() {
   return h(React.Fragment, null,
     h(Nav, { onLogoClick: goHome, search, onSearch: setSearch }),
     propertiesError && h('p', { className: 'load-error', role: 'alert' }, propertiesError),
-    !selected && h(FilterBar, { active: filter, onChange: setFilter, properties }),
+    propertiesLoading && h('p', { className: 'load-error' }, 'Loading current properties...'),
+    !selected && !propertiesLoading && h(FilterBar, { active: filter, onChange: setFilter, properties }),
     selected
       ? h(DetailView, { prop: selected, onBack: goHome })
-      : h(HomeView, { onSelect: goDetail, search, filter, properties }),
+      : !propertiesLoading && h(HomeView, { onSelect: goDetail, search, filter, properties }),
     h(Footer, null)
   );
 }
