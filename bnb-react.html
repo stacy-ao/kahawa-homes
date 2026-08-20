@@ -938,7 +938,8 @@ function App() {
   const [propertiesError, setPropertiesError] = useState('');
 
   useEffect(() => {
-    const loadProperties = (url) => fetch(url).then(response => {
+    const dataVersion = 'b7c6a69';
+    const loadProperties = (url) => fetch(`${url}?v=${dataVersion}`, { cache: 'no-store' }).then(response => {
       if (!response.ok) throw new Error(`Could not load ${url} (${response.status})`);
       return response.json();
     });
