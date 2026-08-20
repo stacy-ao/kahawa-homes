@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <title>Kahawa Homes – Boutique B&B</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%2324140f'/%3E%3Ctext x='32' y='42' text-anchor='middle' font-family='Georgia' font-size='25' fill='%23d2a45b'%3EKH%3C/text%3E%3C/svg%3E" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="description" content="Kahawa Homes – Luxury Bed & Breakfast in Kenya. Browse and book directly via WhatsApp.">
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -762,7 +763,7 @@ function FilterBar({ active, onChange, properties }) {
 function LandingView({ onExplore, properties }) {
   const photos = (properties.length ? properties : fallbackProperties).flatMap(property => property.images).slice(0, 3);
   return h('main', { className: 'landing-screen' },
-    h('div', { className: 'landing-brand' }, 'ESCAPE', h('span', null, '°')),
+    h('div', { className: 'landing-brand' }, 'Kahawa', h('span', null, ' Homes')),
     h('div', { className: 'landing-content' },
       h('div', { className: 'landing-collage' },
         photos.map((photo, index) => h('div', { key: photo + index, className: `landing-photo ${['one','two','three'][index]}` }, h('img', { src: photo, alt: '' })))
