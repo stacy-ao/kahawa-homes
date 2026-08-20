@@ -768,7 +768,7 @@ function LandingView({ onExplore, properties }) {
       h('div', { className: 'landing-collage' },
         photos.map((photo, index) => h('div', { key: photo + index, className: `landing-photo ${['one','two','three'][index]}` }, h('img', { src: photo, alt: '' })))
       ),
-      h('p', { className: 'landing-subtitle' }, 'No stress, just travel'),
+      h('p', { className: 'landing-subtitle' }, 'No stress, just relax'),
       h('h1', { className: 'landing-title' }, 'Find the perfect place to relax for a couple of taps'),
       h('button', { className: 'landing-cta', onClick: onExplore }, 'Let\'s Escape')
     )
@@ -784,13 +784,23 @@ function BrowseNav({ active, onChange }) {
   );
 }
 
-function FilterModal({ onClose, priceMax, onPriceChange, type, onTypeChange }) {
+function FilterModal({ onClose, priceMax, onPriceChange, type, onTypeChange, filter, locations, onLocationChange, ratingMin, onRatingChange, reviewsMin, onReviewsChange }) {
   return h('div', { className: 'filter-modal', onClick: onClose },
     h('section', { className: 'filter-sheet', role: 'dialog', 'aria-modal': 'true', 'aria-label': 'Filter homes', onClick: event => event.stopPropagation() },
       h('div', { className: 'filter-sheet-head' }, h('h2', null, 'Filter homes'), h('button', { className: 'icon-circle', onClick: onClose, 'aria-label': 'Close filters' }, h(IconClose))),
+      h('strong', null, 'Location'),
+      h('div', { className: 'filter-options' },
+        locations.map(option => h('button', { key: option, className: `filter-option${filter === option ? ' active' : ''}`, onClick: () => onLocationChange(option) }, option))
+      ),
       h('strong', null, 'Price range'),
       h('input', { className: 'filter-range', type: 'range', min: 0, max: 30000, step: 500, value: priceMax, onChange: event => onPriceChange(Number(event.target.value)) }),
       h('div', { className: 'range-labels' }, h('span', null, 'KES 0'), h('span', null, `KES ${priceMax.toLocaleString()}`)),
+      h('strong', null, 'Minimum rating'),
+      h('input', { className: 'filter-range', type: 'range', min: 0, max: 5, step: .1, value: ratingMin, onChange: event => onRatingChange(Number(event.target.value)) }),
+      h('div', { className: 'range-labels' }, h('span', null, 'Any rating'), h('span', null, `${ratingMin.toFixed(1)}+ stars`)),
+      h('strong', null, 'Minimum reviews'),
+      h('input', { className: 'filter-range', type: 'range', min: 0, max: 100, step: 1, value: reviewsMin, onChange: event => onReviewsChange(Number(event.target.value)) }),
+      h('div', { className: 'range-labels' }, h('span', null, 'Any reviews'), h('span', null, `${reviewsMin}+ reviews`)),
       h('strong', null, 'Property type'),
       h('div', { className: 'filter-options' },
         ['All types', 'Hotel', 'Villa', 'Apartment'].map(option => h('button', { key: option, className: `filter-option${type === option ? ' active' : ''}`, onClick: () => onTypeChange(option) }, option))
@@ -835,33 +845,28 @@ function PropertyCard({ prop, onClick }) {
 /* ────────────────────────────────────────────
    HOME VIEW
 ──────────────────────────────────────────── */
-function HomeView({ onSelect, search, filter, properties, onOpenFilters, onCycleLocation, type, priceMax, onNavChange }) {
+function HomeView({ onSelect, search, filter, properties, onOpenFilters, type, priceMax, ratingMin, reviewsMin, onNavChange }) {
   const searchTerm = search.trim().toLowerCase();
   const filtered = properties.filter(prop => {
     const matchesLocation = filter === 'All locations' || prop.location.startsWith(`${filter},`) || prop.location === filter;
     const matchesPrice = prop.pricePerNight <= priceMax;
     const matchesType = type === 'All types' || prop.type.toLowerCase().includes(type.toLowerCase());
+    const matchesRating = prop.rating >= ratingMin;
+    const matchesReviews = prop.reviews >= reviewsMin;
     const matchesSearch = !searchTerm || [prop.name, prop.location, prop.description]
       .some(value => value.toLowerCase().includes(searchTerm));
-    return matchesLocation && matchesPrice && matchesType && matchesSearch;
+    return matchesLocation && matchesPrice && matchesType && matchesRating && matchesReviews && matchesSearch;
   });
-  const locations = ['All locations', ...new Set(properties.map(prop => prop.location.split(',')[0].trim()))];
   return h('div', { className: 'home-wrap fade-in' },
     h('div', { className: 'browse-header' },
       h('div', null, h('div', { className: 'browse-greeting' }, 'Hey, Nelly'), h('p', { className: 'card-location' }, 'Find a place to slow down')),
       h('button', { className: 'icon-circle', 'aria-label': 'Notifications' }, h(IconBell))
     ),
     h('div', { className: 'browse-tools' },
-      h('button', { className: 'browse-filter', onClick: onCycleLocation }, filter === 'All locations' ? 'Location' : filter, h(IconChevron)),
+      h('button', { className: 'browse-filter', onClick: onOpenFilters }, filter === 'All locations' ? 'Location' : filter, h(IconChevron)),
       h('button', { className: 'browse-filter', onClick: onOpenFilters }, 'Price', h(IconChevron)),
       h('button', { className: 'browse-filter', onClick: onOpenFilters }, 'Rating', h(IconChevron)),
       h('button', { className: 'browse-filter', onClick: onOpenFilters }, 'Reviews', h(IconChevron))
-    ),
-    h('h2', { className: 'section-heading' }, 'Recently explored'),
-    h('div', { className: 'recent-row' },
-      properties.slice(0, 4).map(property => h('div', { className: 'recent-card', key: property.id, onClick: () => onSelect(property) },
-        h('img', { src: property.images[0], alt: property.location }), h('span', null, 'Want to visit')
-      ))
     ),
     h('div', { className: 'section-heading' },
       `${searchTerm ? `Search results for "${search.trim()}"` : filter === 'All locations' ? 'Popular homes' : `Homes in ${filter}`} →`
@@ -1155,6 +1160,8 @@ function App() {
   const [filter, setFilter]     = useState('All locations');
   const [type, setType]           = useState('All types');
   const [priceMax, setPriceMax]   = useState(30000);
+  const [ratingMin, setRatingMin] = useState(0);
+  const [reviewsMin, setReviewsMin] = useState(0);
   const [filterOpen, setFilterOpen] = useState(false);
   const [browseNav, setBrowseNav] = useState(0);
   const [properties, setProperties] = useState([]);
@@ -1186,10 +1193,7 @@ function App() {
 
   const goHome = () => { setSelected(null); setCurrentScreen('browse'); window.scrollTo(0,0); };
   const goDetail = (p) => { setSelected(p); setCurrentScreen('detail'); window.scrollTo(0,0); };
-  const cycleLocation = () => {
-    const locations = ['All locations', ...new Set(properties.map(prop => prop.location.split(',')[0].trim()))];
-    setFilter(locations[(locations.indexOf(filter) + 1) % locations.length]);
-  };
+  const locations = ['All locations', ...new Set(properties.map(prop => prop.location.split(',')[0].trim()))];
 
   return h(React.Fragment, null,
     currentScreen === 'landing'
@@ -1200,9 +1204,9 @@ function App() {
         propertiesLoading && h('p', { className: 'load-error' }, 'Loading current properties...'),
         currentScreen === 'detail' && selected
           ? h(DetailView, { prop: selected, onBack: goHome })
-          : !propertiesLoading && h(HomeView, { onSelect: goDetail, search, filter, properties, onOpenFilters: () => setFilterOpen(true), onCycleLocation: cycleLocation, type, priceMax, onNavChange: setBrowseNav }),
+          : !propertiesLoading && h(HomeView, { onSelect: goDetail, search, filter, properties, onOpenFilters: () => setFilterOpen(true), type, priceMax, ratingMin, reviewsMin, onNavChange: setBrowseNav }),
         currentScreen !== 'detail' && h(Footer, null),
-        filterOpen && h(FilterModal, { onClose: () => setFilterOpen(false), priceMax, onPriceChange: setPriceMax, type, onTypeChange: setType })
+        filterOpen && h(FilterModal, { onClose: () => setFilterOpen(false), priceMax, onPriceChange: setPriceMax, type, onTypeChange: setType, filter, locations, onLocationChange: setFilter, ratingMin, onRatingChange: setRatingMin, reviewsMin, onReviewsChange: setReviewsMin })
       )
   );
 }
