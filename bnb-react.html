@@ -644,6 +644,20 @@ function Nav({ onLogoClick, search, onSearch }) {
 }
 
 /* ────────────────────────────────────────────
+   LOCATION FILTER
+──────────────────────────────────────────── */
+function FilterBar({ active, onChange, properties }) {
+  const locations = ['All locations', ...new Set(properties.map(prop => prop.location.split(',')[0].trim()))];
+  return h('div', { className: 'filter-bar' },
+    locations.map(location => h('button', {
+      key: location,
+      className: `chip${active === location ? ' active' : ''}`,
+      onClick: () => onChange(location)
+    }, location))
+  );
+}
+
+/* ────────────────────────────────────────────
    PROPERTY CARD
 ──────────────────────────────────────────── */
 function PropertyCard({ prop, onClick }) {
@@ -675,13 +689,17 @@ function PropertyCard({ prop, onClick }) {
 /* ────────────────────────────────────────────
    HOME VIEW
 ──────────────────────────────────────────── */
-function HomeView({ onSelect, search, properties }) {
+function HomeView({ onSelect, search, filter, properties }) {
   const searchTerm = search.trim().toLowerCase();
-  const filtered = properties.filter(prop => !searchTerm || [prop.name, prop.location, prop.description]
-    .some(value => value.toLowerCase().includes(searchTerm)));
+  const filtered = properties.filter(prop => {
+    const matchesLocation = filter === 'All locations' || prop.location.startsWith(`${filter},`) || prop.location === filter;
+    const matchesSearch = !searchTerm || [prop.name, prop.location, prop.description]
+      .some(value => value.toLowerCase().includes(searchTerm));
+    return matchesLocation && matchesSearch;
+  });
   return h('div', { className: 'home-wrap fade-in' },
     h('div', { className: 'section-heading' },
-      `${searchTerm ? `Search results for "${search.trim()}"` : 'Popular homes'} →`
+      `${searchTerm ? `Search results for "${search.trim()}"` : filter === 'All locations' ? 'Popular homes' : `Homes in ${filter}`} →`
     ),
     h('div', { className: 'prop-grid' },
       filtered.map(p => h(PropertyCard, { key: p.id, prop: p, onClick: () => onSelect(p) }))
@@ -898,6 +916,7 @@ function Footer() {
 function App() {
   const [selected, setSelected] = useState(null);
   const [search, setSearch]     = useState('');
+  const [filter, setFilter]     = useState('All locations');
   const [properties, setProperties] = useState(fallbackProperties);
   const [propertiesError, setPropertiesError] = useState('');
 
@@ -924,9 +943,10 @@ function App() {
   return h(React.Fragment, null,
     h(Nav, { onLogoClick: goHome, search, onSearch: setSearch }),
     propertiesError && h('p', { className: 'load-error', role: 'alert' }, propertiesError),
+    !selected && h(FilterBar, { active: filter, onChange: setFilter, properties }),
     selected
       ? h(DetailView, { prop: selected, onBack: goHome })
-      : h(HomeView, { onSelect: goDetail, search, properties }),
+      : h(HomeView, { onSelect: goDetail, search, filter, properties }),
     h(Footer, null)
   );
 }
