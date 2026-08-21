@@ -138,6 +138,31 @@
     .profile-input:focus { border-color: var(--gold); }
     .profile-actions { display: flex; justify-content: flex-end; gap: .6rem; margin-top: 1rem; }
     .profile-cancel { border: 1px solid var(--border); background: var(--white); border-radius: 9999px; padding: .7rem 1rem; }
+    .nav-link.active { background: var(--cream); }
+    .guide-modal, .review-modal { position: fixed; inset: 0; z-index: 250; background: rgba(20,14,11,.42); display: grid; place-items: center; padding: 1rem; overflow-y: auto; }
+    .guide-sheet, .review-sheet { width: min(100%, 720px); max-height: min(90vh, 760px); overflow-y: auto; background: var(--cream); border: 1px solid var(--border); border-radius: 1.25rem; padding: 1.5rem; box-shadow: var(--shadow-lg); }
+    .guide-head, .review-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem; margin-bottom: 1.2rem; }
+    .guide-head h2, .review-head h2 { font-family: var(--serif); line-height: 1.15; }
+    .guide-head p, .review-head p { color: var(--muted); font-size: .85rem; margin-top: .25rem; }
+    .guide-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .9rem; }
+    .guide-card { background: var(--white); border: 1px solid var(--border); border-radius: var(--r); padding: 1rem; }
+    .guide-card h3 { font-family: var(--serif); font-size: 1.05rem; margin-bottom: .45rem; }
+    .guide-card p, .guide-card li { color: var(--espresso-mid); font-size: .84rem; line-height: 1.55; }
+    .guide-card ul { padding-left: 1.1rem; display: grid; gap: .3rem; }
+    .guide-card.wide { grid-column: 1 / -1; }
+    .guide-links { display: grid; gap: .45rem; }
+    .guide-links a { color: var(--espresso); font-size: .84rem; font-weight: 600; text-decoration: none; }
+    .guide-links a:hover { color: var(--gold); }
+    .guide-action, .review-submit { border: 0; border-radius: var(--r-pill); background: var(--espresso); color: var(--white); padding: .7rem 1rem; font-weight: 700; }
+    .guide-action:hover, .review-submit:hover { background: var(--espresso-mid); }
+    .review-stars { display: flex; gap: .35rem; margin: .8rem 0 1.2rem; }
+    .review-star { border: 0; background: transparent; color: var(--gold-lt); font-size: 2rem; line-height: 1; padding: 0; }
+    .review-star.selected { color: var(--gold); }
+    .review-tags { display: flex; flex-wrap: wrap; gap: .5rem; margin: .5rem 0 1rem; }
+    .review-tag { border: 1px solid var(--border); background: var(--white); border-radius: var(--r-pill); padding: .55rem .8rem; color: var(--espresso-mid); }
+    .review-tag.selected { background: var(--gold-lt); border-color: var(--gold); color: var(--espresso); }
+    .review-comment { width: 100%; min-height: 42px; resize: vertical; border: 1px solid var(--border); border-radius: var(--r); padding: .7rem .8rem; background: var(--white); font: inherit; margin-bottom: 1rem; }
+    .review-success { color: var(--espresso-mid); font-weight: 600; padding: 1rem 0; }
 
     /* ══════════════════════════════════════════
        FILTER CHIPS
@@ -481,6 +506,9 @@
       background: var(--white); margin-bottom: 1rem;
     }
     .name-field:focus, .guests-field:focus { outline: none; border-color: var(--gold); }
+    .booking-options { display: grid; gap: .55rem; margin: .2rem 0 1rem; }
+    .booking-option { display: flex; align-items: center; gap: .55rem; color: var(--espresso-mid); font-size: .84rem; cursor: pointer; }
+    .booking-option input { width: 16px; height: 16px; accent-color: var(--espresso); }
     .wa-btn {
       width: 100%; padding: .95rem;
       background: var(--green);
@@ -568,6 +596,9 @@
       .browse-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .8rem; }
       .bottom-nav { bottom: .65rem; }
       .detail-bottom-bar { bottom: .65rem; }
+      .guide-grid { grid-template-columns: 1fr; }
+      .guide-card.wide { grid-column: auto; }
+      .nav-link { padding: .4rem; font-size: .75rem; }
     }
 
     /* ══════════════════════════════════════════
@@ -773,7 +804,7 @@ const getAmenityIcon = (name) => {
 /* ────────────────────────────────────────────
    NAV
 ──────────────────────────────────────────── */
-function Nav({ onLogoClick, search, onSearch, onProfile }) {
+function Nav({ onLogoClick, search, onSearch, onProfile, onReview }) {
   return h('nav', { className: 'nav' },
     h('button', { className: 'nav-logo', onClick: onLogoClick, 'aria-label': 'Go to homepage' },
       'Kahawa', h('span', null, ' Homes')
@@ -790,6 +821,7 @@ function Nav({ onLogoClick, search, onSearch, onProfile }) {
       h('button', { className: 'nav-search-btn', type: 'submit', 'aria-label': 'Search' }, h(IconSearch))
     ),
     h('div', { className: 'nav-right' },
+      h('button', { className: 'nav-link', onClick: onReview }, 'Review'),
       h('button', { className: 'nav-avatar', onClick: onProfile, 'aria-label': 'Open profile' }, h(IconUser))
     )
   );
@@ -814,13 +846,13 @@ function LandingView({ onExplore, properties, userName, onNameChange }) {
   const [lightboxPhoto, setLightboxPhoto] = useState(null);
   const photos = (properties.length ? properties : fallbackProperties).flatMap(property => property.images).slice(0, 3);
   return h('main', { className: 'landing-screen' },
-    h('div', { className: 'landing-brand' }, 'Kahawa', h('span', null, ' Homes')),
+    h('div', { className: 'landing-brand' }, 'Kahawa', h('span', null, ' Homes & Safaris')),
     h('div', { className: 'landing-content' },
       h('div', { className: 'landing-collage' },
         photos.map((photo, index) => h('button', { key: photo + index, className: `landing-photo ${['one','two','three'][index]}${activePhoto === index ? ' active' : ''}`, onClick: () => { setActivePhoto(index); setLightboxPhoto(index); }, 'aria-label': `Open photo ${index + 1}` }, h('img', { src: photo, alt: '' })))
       ),
-      h('p', { className: 'landing-subtitle' }, 'Home Travel Tours'),
-      h('h1', { className: 'landing-title' }, 'creating your entire experience'),
+      h('p', { className: 'landing-subtitle' }, 'STAYS · TRAVEL · EXPERIENCES'),
+      h('h1', { className: 'landing-title' }, 'Creating your entire experience'),
       h('input', { className: 'landing-name', value: userName, onChange: event => onNameChange(event.target.value), placeholder: 'What should we call you?', 'aria-label': 'Your name' }),
       h('button', { className: 'landing-cta', onClick: onExplore }, 'Let\'s Escape')
     ),
@@ -883,6 +915,75 @@ function ProfileModal({ userName, onSave, onClose }) {
         h('button', { className: 'profile-cancel', onClick: onClose }, 'Cancel'),
         h('button', { className: 'landing-cta', onClick: () => { onSave(draftName.trim()); onClose(); } }, 'Save name')
       )
+    )
+  );
+}
+
+function GuestGuideModal({ prop, onClose }) {
+  const locationQuery = encodeURIComponent(prop.location);
+  const propertyRules = prop.rules.length ? prop.rules : ['Please treat the home with care.', 'Keep noise considerate for neighbours.', 'Follow the stated check-in and checkout times.'];
+  return h('div', { className: 'guide-modal', onClick: onClose },
+    h('section', { className: 'guide-sheet', role: 'dialog', 'aria-modal': 'true', 'aria-label': 'Guest Guide', onClick: event => event.stopPropagation() },
+      h('div', { className: 'guide-head' },
+        h('div', null, h('h2', null, `${prop.name} Guest Guide`), h('p', null, `Useful details for your stay in ${prop.location}.`)),
+        h('button', { className: 'icon-circle', onClick: onClose, 'aria-label': 'Close Guest Guide' }, h(IconClose))
+      ),
+      h('div', { className: 'guide-grid' },
+        h('article', { className: 'guide-card' },
+          h('h3', null, 'House Rules & How-To'),
+          h('ul', null,
+            h('li', null, 'TV: switch on the TV, then choose the streaming app from the home screen.'),
+            h('li', null, 'Amenities: switch off lights and air conditioning when leaving the room.'),
+            ...propertyRules.map((rule, index) => h('li', { key: `rule-${index}` }, rule)),
+            h('li', null, 'Need help? Call or WhatsApp the host before attempting repairs.')
+          )
+        ),
+        h('article', { className: 'guide-card' },
+          h('h3', null, 'Local Spots'),
+          h('div', { className: 'guide-links' },
+            h('a', { href: `https://www.google.com/maps/search/supermarket+near+${locationQuery}`, target: '_blank', rel: 'noreferrer' }, `Supermarkets near ${prop.location}`),
+            h('a', { href: `https://www.google.com/maps/search/restaurants+near+${locationQuery}`, target: '_blank', rel: 'noreferrer' }, `Restaurants near ${prop.location}`),
+            h('a', { href: `https://www.google.com/maps/search/emergency+services+near+${locationQuery}`, target: '_blank', rel: 'noreferrer' }, `Emergency services near ${prop.location}`)
+          )
+        )
+      )
+    )
+  );
+}
+
+function ReviewModal({ onClose }) {
+  const [rating, setRating] = useState(0);
+  const [attributes, setAttributes] = useState([]);
+  const [comment, setComment] = useState('');
+  const [submitted, setSubmitted] = useState(false);
+  const quickTags = ['Clean', 'Cozy', 'Good Location', 'Great Host'];
+  const toggleAttribute = tag => setAttributes(current => current.includes(tag) ? current.filter(item => item !== tag) : [...current, tag]);
+  const submitReview = event => {
+    event.preventDefault();
+    if (!rating) return;
+    const reviews = JSON.parse(localStorage.getItem('kahawa-reviews') || '[]');
+    reviews.push({ rating, attributes, comment: comment.trim(), createdAt: Date.now() });
+    localStorage.setItem('kahawa-reviews', JSON.stringify(reviews));
+    setSubmitted(true);
+  };
+  return h('div', { className: 'review-modal', onClick: onClose },
+    h('section', { className: 'review-sheet', role: 'dialog', 'aria-modal': 'true', 'aria-label': 'Leave a review', onClick: event => event.stopPropagation() },
+      h('div', { className: 'review-head' },
+        h('div', null, h('h2', null, 'How was your stay?'), h('p', null, 'A quick review helps future guests choose well.')),
+        h('button', { className: 'icon-circle', onClick: onClose, 'aria-label': 'Close review form' }, h(IconClose))
+      ),
+      submitted
+        ? h('p', { className: 'review-success' }, 'Thanks for sharing your experience.')
+        : h('form', { onSubmit: submitReview },
+          h('strong', null, 'Your rating'),
+          h('div', { className: 'review-stars', 'aria-label': 'Choose a star rating' },
+            [1, 2, 3, 4, 5].map(value => h('button', { key: value, type: 'button', className: `review-star${rating >= value ? ' selected' : ''}`, onClick: () => setRating(value), 'aria-label': `${value} star${value > 1 ? 's' : ''}` }, '★'))
+          ),
+          h('strong', null, 'What stood out?'),
+          h('div', { className: 'review-tags' }, quickTags.map(tag => h('button', { key: tag, type: 'button', className: `review-tag${attributes.includes(tag) ? ' selected' : ''}`, onClick: () => toggleAttribute(tag) }, tag))),
+          h('input', { className: 'review-comment', value: comment, onChange: event => setComment(event.target.value), placeholder: 'Optional comment', 'aria-label': 'Optional comment' }),
+          h('button', { className: 'review-submit', type: 'submit', disabled: !rating }, 'Submit')
+        )
     )
   );
 }
@@ -1013,7 +1114,10 @@ function DetailView({ prop, onBack, userName, onBooking, onBook }) {
   const [checkOut, setCheckOut] = useState('');
   const [guests, setGuests]     = useState(1);
   const [name, setName]         = useState('');
+  const [needsTransport, setNeedsTransport] = useState(false);
+  const [interestedTours, setInterestedTours] = useState(false);
   const [activeImage, setActiveImage] = useState(null);
+  const [guideOpen, setGuideOpen] = useState(false);
 
   useEffect(() => {
     if (activeImage === null) return undefined;
@@ -1036,8 +1140,13 @@ function DetailView({ prop, onBack, userName, onBooking, onBook }) {
   const handleBook = () => {
     if (!name || !checkIn || !checkOut) { alert('Please fill in your name and dates.'); return; }
     if (hasBookedDateInRange || prop.bookedDates.includes(checkIn) || prop.bookedDates.includes(checkOut)) { alert('One or more selected dates are already booked. Please choose different dates.'); return; }
-    onBooking({ property: prop.name, location: prop.location, checkIn, checkOut, name, createdAt: Date.now() });
-    const msg = `Hello! I would like to book *${prop.name}* in *${prop.location}* from *${checkIn}* to *${checkOut}* for *${guests} guest(s)*. My name is *${name}*. Please confirm availability. Thank you!`;
+    const preferences = [
+      needsTransport && 'Need Transportation / Airport Transfer',
+      interestedTours && 'Interested in Tour Services'
+    ].filter(Boolean);
+    onBooking({ property: prop.name, location: prop.location, checkIn, checkOut, name, guests, preferences, createdAt: Date.now() });
+    const preferenceText = preferences.length ? `\n\nAdditional preferences:\n${preferences.map(preference => `- ${preference}`).join('\n')}` : '';
+    const msg = `Hello! I would like to book *${prop.name}* in *${prop.location}* from *${checkIn}* to *${checkOut}* for *${guests} guest(s)*. My name is *${name}*. Please confirm availability. Thank you!${preferenceText}`;
     window.open(`https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(msg)}`, '_blank');
   };
 
@@ -1049,6 +1158,7 @@ function DetailView({ prop, onBack, userName, onBooking, onBook }) {
     h('div', { className: 'detail-header' },
       h('h1', { className: 'detail-title' }, prop.name),
       h('div', { className: 'detail-actions' },
+        h('button', { className: 'detail-action-btn', onClick: () => setGuideOpen(true) }, 'Guest Guide'),
         h('button', { className: 'detail-action-btn' }, h(IconShare), ' Share'),
         h('button', { className: 'detail-action-btn' }, h(IconHeart), ' Save')
       )
@@ -1183,6 +1293,17 @@ function DetailView({ prop, onBack, userName, onBooking, onBook }) {
             [...Array(prop.guests)].map((_, i) => h('option', { key: i+1, value: i+1 }, `${i+1} guest${i+1 > 1 ? 's' : ''}`))
           ),
 
+          h('div', { className: 'booking-options' },
+            h('label', { className: 'booking-option' },
+              h('input', { type: 'checkbox', checked: needsTransport, onChange: event => setNeedsTransport(event.target.checked) }),
+              'Need Transportation / Airport Transfer'
+            ),
+            h('label', { className: 'booking-option' },
+              h('input', { type: 'checkbox', checked: interestedTours, onChange: event => setInterestedTours(event.target.checked) }),
+              'Interested in Tour Services'
+            )
+          ),
+
           // WhatsApp button
           h('button', { className: 'wa-btn', onClick: handleBook },
             h(IconWA), 'Reserve via WhatsApp'
@@ -1211,6 +1332,7 @@ function DetailView({ prop, onBack, userName, onBooking, onBook }) {
       )
     ),
     h(DetailBottomBar, { prop, onBook }),
+    guideOpen && h(GuestGuideModal, { prop, onClose: () => setGuideOpen(false) }),
     activeImage !== null && h('div', { className: 'photo-modal', role: 'dialog', 'aria-modal': 'true', 'aria-label': `${prop.name} photo gallery`, onClick: () => setActiveImage(null) },
       h('button', { className: 'photo-modal-close', onClick: () => setActiveImage(null), 'aria-label': 'Close photos', title: 'Close photos' }, h(IconClose)),
       prop.images.length > 1 && h('button', { className: 'photo-modal-nav photo-modal-prev', onClick: event => { event.stopPropagation(); setActiveImage(index => (index - 1 + prop.images.length) % prop.images.length); }, 'aria-label': 'Previous photo' }, '‹'),
@@ -1290,6 +1412,7 @@ function App() {
   const [booking, setBooking] = useState(() => JSON.parse(localStorage.getItem('kahawa-booking') || 'null'));
   const [notificationOpen, setNotificationOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
+  const [reviewOpen, setReviewOpen] = useState(false);
   const [properties, setProperties] = useState([]);
   const [propertiesLoading, setPropertiesLoading] = useState(true);
   const [propertiesError, setPropertiesError] = useState('');
@@ -1371,7 +1494,7 @@ function App() {
     currentScreen === 'landing'
       ? h('div', { className: 'site-shell' }, h(LandingView, { onExplore: goHome, properties, userName, onNameChange: saveUserName }))
       : h('div', { className: 'site-shell' },
-        h(Nav, { onLogoClick: goHome, search, onSearch: setSearch, onProfile: () => setProfileOpen(true) }),
+        h(Nav, { onLogoClick: goHome, search, onSearch: setSearch, onProfile: () => setProfileOpen(true), onReview: () => setReviewOpen(true) }),
         propertiesError && h('p', { className: 'load-error', role: 'alert' }, propertiesError),
         propertiesLoading && h('p', { className: 'load-error' }, 'Loading current properties...'),
         currentScreen === 'detail' && selected
@@ -1380,6 +1503,7 @@ function App() {
         currentScreen !== 'detail' && h(Footer, null),
         filterOpen && h(FilterModal, { onClose: () => setFilterOpen(false), priceMax, onPriceChange: setPriceMax, type, onTypeChange: setType, filter, locations, onLocationChange: setFilter, ratingMin, onRatingChange: setRatingMin, reviewsMin, onReviewsChange: setReviewsMin }),
         profileOpen && h(ProfileModal, { userName, onSave: saveUserName, onClose: () => setProfileOpen(false) }),
+        reviewOpen && h(ReviewModal, { onClose: () => setReviewOpen(false) }),
         h(BookingReminder, { booking: notificationOpen ? booking : null, onClose: () => setNotificationOpen(false) })
       )
   );
