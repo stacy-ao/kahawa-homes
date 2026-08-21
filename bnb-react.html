@@ -356,7 +356,7 @@
     .landing-brand { font-family: var(--serif); font-size: 1.35rem; font-weight: 700; letter-spacing: .08em; color: var(--espresso); }
     .landing-brand span { color: var(--gold); }
     .landing-content { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; gap: 1.5rem; }
-    .landing-badge { display: block; width: min(100%, 720px); max-height: 62vh; object-fit: contain; margin: 0 auto; }
+    .landing-badge { display: block; width: min(100%, 860px); height: auto; max-width: 100%; margin: 0 auto; }
     .landing-name { width: min(100%, 280px); padding: .8rem 1rem; border: 1px solid var(--border); border-radius: 9999px; background: var(--white); text-align: center; font: inherit; }
     .landing-cta { background: var(--espresso); color: white; border: none; border-radius: 9999px; padding: .95rem 1.8rem; font: inherit; font-weight: 700; cursor: pointer; }
     .landing-cta:hover { background: var(--espresso-mid); transform: translateY(-1px); }
@@ -584,6 +584,7 @@
       .amenities-grid-detail { grid-template-columns: 1fr; }
       .photo-modal-close { top: 4.75rem; right: 1rem; }
       .landing-screen { padding: 1.2rem; }
+      .landing-badge { width: calc(100vw - 2.4rem); max-width: 100%; }
       .recent-row { margin-left: -1.2rem; margin-right: -1.2rem; padding-left: 1.2rem; padding-right: 1.2rem; }
       .browse-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .8rem; }
       .bottom-nav { bottom: .65rem; }
@@ -833,7 +834,7 @@ function LandingView({ onExplore, userName, onNameChange }) {
   return h('main', { className: 'landing-screen' },
     h('div', { className: 'landing-brand' }, 'Kahawa', h('span', null, ' Homes & Safaris')),
     h('div', { className: 'landing-content' },
-      h('img', { className: 'landing-badge', src: 'images/logo.jpeg', alt: 'Kahawa Homes & Safaris. Stays, travel, experiences. Creating your entire experience.' }),
+      h('img', { className: 'landing-badge', src: 'images/logo2.jpeg', alt: 'Kahawa Homes & Safaris. Stays, travel, experiences. Creating your entire experience.' }),
       h('input', { className: 'landing-name', value: userName, onChange: event => onNameChange(event.target.value), placeholder: 'What should we call you?', 'aria-label': 'Your name' }),
       h('button', { className: 'landing-cta', onClick: onExplore }, 'Let\'s Escape')
     )
