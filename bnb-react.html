@@ -804,8 +804,8 @@ function LandingView({ onExplore, properties, userName, onNameChange }) {
       h('div', { className: 'landing-collage' },
         photos.map((photo, index) => h('button', { key: photo + index, className: `landing-photo ${['one','two','three'][index]}${activePhoto === index ? ' active' : ''}`, onClick: () => { setActivePhoto(index); setLightboxPhoto(index); }, 'aria-label': `Open photo ${index + 1}` }, h('img', { src: photo, alt: '' })))
       ),
-      h('p', { className: 'landing-subtitle' }, 'No stress, just relax'),
-      h('h1', { className: 'landing-title' }, 'Find the perfect place to relax for a couple of taps'),
+      h('p', { className: 'landing-subtitle' }, 'Home Travel Tours'),
+      h('h1', { className: 'landing-title' }, 'creating your entire experience'),
       h('input', { className: 'landing-name', value: userName, onChange: event => onNameChange(event.target.value), placeholder: 'What should we call you?', 'aria-label': 'Your name' }),
       h('button', { className: 'landing-cta', onClick: onExplore }, 'Let\'s Escape')
     ),

@@ -35,6 +35,58 @@
       "https://raw.githubusercontent.com/stacy-ao/kahawa-homes/main/images/imageshouse3.jpg.jpeg"
     ],
     "description": "Quiet retreat with beautiful outdoor greenery."
+  },
+  {
+    "id": 4,
+    "name": "Sunrise City Apartment",
+    "location": "Nairobi",
+    "price": "KES 3500 / night",
+    "images": [
+      "https://picsum.photos/800/600?random=41",
+      "https://picsum.photos/800/600?random=42",
+      "https://picsum.photos/800/600?random=43"
+    ],
+    "description": "A bright apartment with calm city views and room to unwind.",
+    "amenities": ["High-Speed WiFi", "Full Kitchen", "Secure Parking"]
+  },
+  {
+    "id": 5,
+    "name": "Coastal Breeze Cottage",
+    "location": "Diani, Mombasa",
+    "price": "KES 4200 / night",
+    "images": [
+      "https://picsum.photos/800/600?random=44",
+      "https://picsum.photos/800/600?random=45",
+      "https://picsum.photos/800/600?random=46"
+    ],
+    "description": "A relaxed coastal cottage made for slow mornings and easy evenings.",
+    "amenities": ["Swimming Pool Access", "Air Conditioning", "24/7 Security"]
+  },
+  {
+    "id": 6,
+    "name": "The Olive Retreat",
+    "location": "Naivasha",
+    "price": "KES 5000 / night",
+    "images": [
+      "https://picsum.photos/800/600?random=47",
+      "https://picsum.photos/800/600?random=48",
+      "https://picsum.photos/800/600?random=49"
+    ],
+    "description": "A peaceful hideaway surrounded by open skies and natural beauty.",
+    "amenities": ["Full Kitchen", "Secure Parking", "USB Charging Ports"]
+  },
+  {
+    "id": 7,
+    "name": "Harbour View Residence",
+    "location": "Nyali, Mombasa",
+    "price": "KES 6500 / night",
+    "images": [
+      "https://picsum.photos/800/600?random=50",
+      "https://picsum.photos/800/600?random=51",
+      "https://picsum.photos/800/600?random=52"
+    ],
+    "description": "A comfortable residence with generous spaces for a memorable stay.",
+    "amenities": ["High-Speed WiFi", "Private Pool", "Secure Parking"]
   }
 
 ]
