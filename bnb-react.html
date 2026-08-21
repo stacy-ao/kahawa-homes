@@ -834,7 +834,7 @@ function LandingView({ onExplore, userName, onNameChange }) {
   return h('main', { className: 'landing-screen' },
     h('div', { className: 'landing-brand' }, 'Kahawa', h('span', null, ' Homes & Safaris')),
     h('div', { className: 'landing-content' },
-      h('img', { className: 'landing-badge', src: 'src: '/images/logo2.jpeg.jpeg'', alt: 'Kahawa Homes & Safaris. Stays, travel, experiences. Creating your entire experience.' }),
+      h('img', { className: 'landing-badge', src:'/images/logo2.jpeg.jpeg', alt: 'Kahawa Homes & Safaris. Stays, travel, experiences. Creating your entire experience.' }),
       h('input', { className: 'landing-name', value: userName, onChange: event => onNameChange(event.target.value), placeholder: 'What should we call you?', 'aria-label': 'Your name' }),
       h('button', { className: 'landing-cta', onClick: onExplore }, 'Let\'s Escape')
     )
