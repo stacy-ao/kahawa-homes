@@ -492,6 +492,17 @@
     }
     .wa-btn:hover { background: #1ebe5d; transform: translateY(-1px); }
     .wa-btn svg { flex-shrink: 0; }
+    .call-btn {
+      width: 100%; padding: .95rem;
+      background: var(--espresso);
+      border: none; border-radius: var(--r);
+      color: white; font-weight: 700; font-size: 1rem;
+      display: flex; align-items: center; justify-content: center; gap: .6rem;
+      text-decoration: none;
+      transition: background .2s, transform .15s;
+      margin-bottom: .8rem;
+    }
+    .call-btn:hover { background: var(--espresso-mid); transform: translateY(-1px); }
     .booking-note { text-align: center; font-size: .78rem; color: var(--muted); }
     .booking-note a { color: var(--espresso); font-weight: 500; text-decoration: underline; }
     .booking-breakdown { border-top: 1px solid var(--border); margin-top: 1rem; padding-top: 1rem; }
@@ -1172,7 +1183,10 @@ function DetailView({ prop, onBack, userName, onBooking, onBook }) {
           h('button', { className: 'wa-btn', onClick: handleBook },
             h(IconWA), 'Reserve via WhatsApp'
           ),
-          h('p', { className: 'booking-note' }, 'You won\'t be charged yet — we\'ll confirm via WhatsApp first.'),
+          h('a', { className: 'call-btn', href: `tel:+${WA_NUMBER}` },
+            h(IconPhone), 'Call Us'
+          ),
+          h('p', { className: 'booking-note' }, 'Choose WhatsApp or call us directly to confirm your booking.'),
 
           // Price breakdown
           nights > 0 && h('div', { className: 'booking-breakdown' },
@@ -1351,7 +1365,7 @@ function App() {
 
   return h(React.Fragment, null,
     currentScreen === 'landing'
-      ? h('div', { className: 'site-shell' }, h(LandingView, { onExplore: () => setCurrentScreen('browse'), properties, userName, onNameChange: saveUserName }))
+      ? h('div', { className: 'site-shell' }, h(LandingView, { onExplore: goHome, properties, userName, onNameChange: saveUserName }))
       : h('div', { className: 'site-shell' },
         h(Nav, { onLogoClick: goHome, search, onSearch: setSearch, onProfile: () => setProfileOpen(true) }),
         propertiesError && h('p', { className: 'load-error', role: 'alert' }, propertiesError),
