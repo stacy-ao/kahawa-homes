@@ -2,6 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import { routes } from './routes';
+import { FloatingContactButton } from './components/ui/FloatingContactButton';
 import './styles/tailwind.css';
 
 class ErrorBoundary extends React.Component<{ children: React.ReactNode }, { hasError: boolean; error: any }> {
@@ -43,6 +44,7 @@ export function App() {
     <React.StrictMode>
       <ErrorBoundary>
         <RouterProvider router={router} />
+        <FloatingContactButton />
       </ErrorBoundary>
     </React.StrictMode>
   );
